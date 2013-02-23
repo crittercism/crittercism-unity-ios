@@ -12,7 +12,7 @@ public static class CrittercismIOS
 	/// Show debug and log messaged in the console in release mode.
 	/// If true CrittercismIOS logs will not appear in the console.
 	/// </summary>
-	const bool _ShowDebugOnOnRelease		= true;
+	const bool _ShowDebugOnOnRelease		= false;
 	
 	private static bool _HandleUnityExceptions	= true;
 	private static bool _IsPluginInited			= false;
@@ -23,89 +23,73 @@ public static class CrittercismIOS
 	const string _INTERNAL	= "__Internal";
 	
 	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_Init(string appID, string key, string secret);
-	
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_InitWithData(string appData);
-	
-	[DllImport(_INTERNAL)]
 	private static extern bool Crittercism_IsInited();
+	[DllImport(_INTERNAL)]
+	private static extern void Crittercism_EnableWithAppID(string appID);
+	
+    [DllImport(_INTERNAL)]
+	private static extern bool Crittercism_LogHandledException();
+	[DllImport(_INTERNAL)]
+	private static extern void Crittercism_LogUnhandledException();
+	[DllImport(_INTERNAL)]
+	private static extern void Crittercism_LogUnhandledExceptionWillCrash();
+	
+	[DllImport(_INTERNAL)]
+	private static extern void Crittercism_SetAsyncBreadcrumbMode(bool writeAsync);
+    [DllImport(_INTERNAL)]
+	private static extern void Crittercism_LeaveBreadcrumb(string breadcrumb);
 	
 	[DllImport(_INTERNAL)]
 	private static extern void Crittercism_NewException(string name, string reason, string stack);
 	
 	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_LogUnhandledException();
+	private static extern string Crittercism_GetUserUUID();
 	
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_LogHandledException();
-	
-	[DllImport(_INTERNAL)]
+    [DllImport(_INTERNAL)]
 	private static extern void Crittercism_SetAge(int age);
+    [DllImport(_INTERNAL)]
+	private static extern void Crittercism_SetGender(string gender);
+	[DllImport(_INTERNAL)]
+	private static extern void Crittercism_SetUsername(string key);
+	[DllImport(_INTERNAL)]
+	private static extern void Crittercism_SetEmail(string email);
+	[DllImport(_INTERNAL)]
+	private static extern void Crittercism_SetValue(string value, string key);
 	
 	[DllImport(_INTERNAL)]
-    private static extern void Crittercism_SetGender(string gender);
-	
+	private static extern void Crittercism_SetOptOutStatus(bool status);
 	[DllImport(_INTERNAL)]
-    private static extern void Crittercism_SetUsername(string username);
-	
-	[DllImport(_INTERNAL)]
-    private static extern void Crittercism_SetEmail(string email);
-	
-	[DllImport(_INTERNAL)]
-    private static extern void Crittercism_SetValue(string value, string key);
-    
-	[DllImport(_INTERNAL)]
-    private static extern void Crittercism_NewLog(string name);
-	
-	[DllImport(_INTERNAL)]
-    private static extern void Crittercism_SetLogValue(string key, string value);
-	
-	[DllImport(_INTERNAL)]
-    private static extern void Crittercism_FinishLog();
-	
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_LeaveBreadcrumb(string breadcrumb);
-	
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_LogUnhandledExceptionWillCrash();
+	private static extern bool Crittercism_GetOptOutStatus();
 	
 	[DllImport(_INTERNAL)]
 	private static extern void Crittercism_RefreshSignalRegister();
 	
-	[DllImport(_INTERNAL)]
-	private static extern bool Crittercism_GetOptOut();
-	
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_SetOptOut(bool s);
-	
 #else
+	private static bool Crittercism_IsInited() { return false; }
+	private static void Crittercism_EnableWithAppID(string appID)	{}
 	
-	private static void Crittercism_Init(string appID, string key, string secret)		{	}
-	private static void Crittercism_InitWithData(string appData)	{	}
-	private static bool Crittercism_IsInited()	{	return false;	}
-	private static void Crittercism_NewException(string name, string reason, string stack)	{	}
-	private static void Crittercism_LogUnhandledException()	{	}
-	private static void Crittercism_LogHandledException()	{	}
+    private static bool Crittercism_LogHandledException()			 { return false; }
+	private static void Crittercism_LogUnhandledException()							{}
+	private static void Crittercism_LogUnhandledExceptionWillCrash()				{}
 	
-	private static void Crittercism_SetAge(int age)	{}
-    private static void Crittercism_SetGender(string gender)	{}
-    private static void Crittercism_SetUsername(string username)	{}
-    private static void Crittercism_SetEmail(string email)	{}
+	private static void Crittercism_SetAsyncBreadcrumbMode(bool writeAsync)			{}
+    private static void Crittercism_LeaveBreadcrumb(string breadcrumb)				{}
 	
-    private static void Crittercism_SetValue(string value, string key)	{}
-    private static void Crittercism_NewLog(string name)	{}
-	private static void Crittercism_SetLogValue(string key, string value)	{}
-	private static void Crittercism_FinishLog()	{}
+	private static void Crittercism_NewException(string name, string reason, string stack) {}
 	
-	private static void Crittercism_LeaveBreadcrumb(string breadcrumb)	{}
+	private static string Crittercism_GetUserUUID()						{ return ""; }
 	
-	private static void Crittercism_LogUnhandledExceptionWillCrash()	{}
+    private static void Crittercism_SetAge(int age)									{}
+    private static void Crittercism_SetGender(string gender)						{}
+	private static void Crittercism_SetUsername(string key)							{}
+	private static void Crittercism_SetEmail(string email)							{}
+	private static void Crittercism_SetValue(string value, string key)				{}
 	
-	private static void Crittercism_RefreshSignalRegister()		{}
+	private static void Crittercism_SetOptOutStatus(bool status)					{}
+	private static bool Crittercism_GetOptOutStatus()				 { return false; }
 	
-	private static bool Crittercism_GetOptOut()	{	return false;	}
-	private static void Crittercism_SetOptOut(bool s)	{}
+	private static void Crittercism_RefreshSignalRegister()							{}
+    
 #endif
 	
 	/// <summary>
@@ -114,7 +98,7 @@ public static class CrittercismIOS
 	/// Application will will attempt to load keys from Resources/CrittercismIDs.text plist formated file.
 	/// </summary>
 	public static void Init()
-	{	Init(null, null, null, true, true);	}
+	{	Init(null, true, true);	}
 	
 	
 	/// <summary>
@@ -125,7 +109,7 @@ public static class CrittercismIOS
 	/// handleUnityExceptions: Allow crittercisms to recieve unity handled exceptions.
 	/// </summary>
 	public static void Init(bool handleUnityExceptions)
-	{	Init(null, null, null, true, handleUnityExceptions);	}
+	{	Init(null, true, handleUnityExceptions);	}
 	
 	
 	/// <summary>
@@ -138,8 +122,8 @@ public static class CrittercismIOS
 	/// key: Crittercisms Provided Key for this application
 	/// Secret: Crittercisms Provided Secret for this application
 	/// </summary>
-	public static  void Init(string appID, string key, string secret)
-	{	Init(appID, key, secret, true, true);	}
+	public static  void Init(string appID)
+	{	Init(appID, false, true);	}
 	
 	
 	/// <summary>
@@ -153,8 +137,8 @@ public static class CrittercismIOS
 	/// secret: Crittercisms Provided Secret for this application
 	/// handleUnityExceptions: Allow crittercisms to recieve unity handled exceptions.
 	/// </summary>
-	public static  void Init(string appID, string key, string secret, bool handleUnityExceptions)
-	{	Init(appID, key, secret, true, handleUnityExceptions);	}
+	public static  void Init(string appID, bool handleUnityExceptions)
+	{	Init(appID, true, handleUnityExceptions);	}
 	
 	
 	/// <summary>
@@ -167,7 +151,7 @@ public static class CrittercismIOS
 	/// loadFromResources: Attempt to load the appID, key, and secret from the CrittercismIDs.text file.
 	/// handleUnityExceptions: Allow crittercisms to recieve unity handled exceptions.
 	/// </summary>
-	public static  void Init(string appID, string key, string secret, bool loadFromResources, bool handleUnityExceptions)
+	public static void Init(string appID, bool loadFromResources, bool handleUnityExceptions)
 	{
 		_IsPluginInited	= Crittercism_IsInited();
 		if(_IsUnityPluginInited && _IsPluginInited)
@@ -192,18 +176,18 @@ public static class CrittercismIOS
 						if(reader == null)	{	throw new System.Exception();	}
 						appData	= reader.ReadToEnd();
 						appData	= WWW.EscapeURL(appData);
-						Debug.Log("We've read some text!");
 					}
 				}
 				catch
-				{	appData	= null; Debug.Log("We failed to read some text! fck!");	}
+				{	appData	= null;	}
 				
 				try
 				{
 					if(appData == null)	{	throw new System.Exception();	}
-					Debug.Log("We have data!");
-					Crittercism_InitWithData(appData);
+					
+					Crittercism_EnableWithAppID(appData);
 					_IsPluginInited	= Crittercism_IsInited();
+					//_IsPluginInited = true;
 				}
 				catch
 				{
@@ -216,13 +200,14 @@ public static class CrittercismIOS
 			if(!_IsPluginInited)
 			{
 				if(appID == null)	{	appID	= "";	}
-				if(key == null)		{	key		= "";	}
-				if(secret == null)	{	secret	= "";	}
+//				if(key == null)		{	key		= "";	}
+//				if(secret == null)	{	secret	= "";	}
 			
 				try
 				{
-					Crittercism_Init(appID, key, secret);
+					Crittercism_EnableWithAppID(appID);
 					_IsPluginInited	= Crittercism_IsInited();
+					//_IsPluginInited = true;
 				}
 				catch
 				{
@@ -231,15 +216,19 @@ public static class CrittercismIOS
 				}
 			}
 		}
+		else
+		{
+			Debug.Log("CrittercismIPS: already initialized");
+		}
 		
 		if(_IsUnityPluginInited == false && _IsPluginInited)
 		{	
 			System.AppDomain.CurrentDomain.UnhandledException += _OnUnresolvedExceptionHandler;
 			Application.RegisterLogCallback(_OnDebugLogCallbackHandler);
 			_IsUnityPluginInited	= true;
+			Debug.Log("CrittercismIOS: Sucessfully Initialized");
 		}
 		
-		Crittercism_RefreshSignalRegister();
 	}
 	
 	/// <summary>
@@ -267,12 +256,12 @@ public static class CrittercismIOS
 	/// <summary>
 	/// Retrieve whether the user is opting out of Crittercism.
 	/// </summary>
-	static public bool GetOptOut()	{	return Crittercism_GetOptOut();	}
+	static public bool GetOptOut()	{	return Crittercism_GetOptOutStatus();	}
 	
 	/// <summary>
 	/// Set if whether the user is opting to use crittercism
 	/// </summary></param>
-	static public void SetOptOut(bool s)	{	Crittercism_SetOptOut(s);	}
+	static public void SetOptOut(bool s)	{	Crittercism_SetOptOutStatus(s);	}
 	
 	/// <summary>
 	/// Set the age of the user.
@@ -313,15 +302,16 @@ public static class CrittercismIOS
 	/// </summary>
 	static public void LogEvent(string eventName, System.Collections.Generic.Dictionary<string, string> vals)
 	{
-		Crittercism_NewLog(eventName);
+//		Crittercism_NewLog(eventName);
 		
 		if(vals != null)
 		{
+			//TODO: Check whether SetValue == SetLogValue
 			foreach(System.Collections.Generic.KeyValuePair<string,string> entry in vals)
-			{	Crittercism_SetLogValue(_EscapeString(entry.Key), _EscapeString(entry.Value));	}
+			{	Crittercism_SetValue(_EscapeString(entry.Key), _EscapeString(entry.Value));	}
 		}
 		
-		Crittercism_FinishLog();
+//		Crittercism_FinishLog();
 	}
 	
 	
@@ -351,7 +341,7 @@ public static class CrittercismIOS
 				string str3	= _EscapeString(e.StackTrace);
 				
 				Crittercism_NewException(str1, str2, str3);
-				//Crittercism_LogUnhandledException();
+				Crittercism_LogUnhandledException();
 				Crittercism_LogUnhandledExceptionWillCrash();
 #else
 				string message	= e.ToString() + "\n" + e.Message + "\n" + e.StackTrace;

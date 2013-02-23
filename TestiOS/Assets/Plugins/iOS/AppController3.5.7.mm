@@ -15,12 +15,9 @@
 
 //	The IDs will be pulled from CrittercismIDs.plist in the main bundle if this file exists
 const char* kCrittercism_App	= "";	//	Your App ID Here
-const char* kCrittercism_Key	= "";	//	Your App Key Here
-const char* kCrittercism_Secret	= "";	//	Your App Secret Here
 
 //	Crittercism Call into library for init
-extern "C" void Crittercism_Init(const char* appID, const char* key, const char* secret);
-
+extern "C" void Crittercism_EnableWithAppID(const char* appID);
 
 // USE_DISPLAY_LINK_IF_AVAILABLE
 //
@@ -172,7 +169,7 @@ int  UnityGetTargetFPS();
 bool UnityIsOrientationEnabled(EnabledOrientation orientation);
 void UnitySetScreenOrientation(ScreenOrientation orientation);
 ScreenOrientation UnityRequestedScreenOrientation();
-ScreenOrientation ConvertToUnityScreenOrientation(UIInterfaceOrientation hwOrient, EnabledOrientation* outAutorotOrient);
+ScreenOrientation ConvertToUnityScreenOrientation(int hwOrient, EnabledOrientation* outAutorotOrient);
 bool UnityUseOSAutorotation();
 
 bool UnityUse32bitDisplayBuffer();
@@ -194,11 +191,16 @@ enum TargetResolution
 int UnityGetTargetResolution();
 
 
-static UIViewController *sGLViewController = nil;
-
-UIViewController *UnityGetGLViewController()
+static UIViewController* sGLViewController = nil;
+UIViewController* UnityGetGLViewController()
 {
 	return sGLViewController;
+}
+
+static UIView* sGLView = nil;
+UIView* UnityGetGLView()
+{
+	return sGLView;
 }
 
 
@@ -215,6 +217,7 @@ ScreenOrientation	_curOrientation			= portrait;
 ScreenOrientation	_autorotOrientation		= kScreenOrientationUnknown;
 bool				_autorotEnableHandling	= false;
 bool				_glesContextCreated		= false;
+bool                _unityLevelReady        = false;
 bool				_skipPresent			= false;
 bool				_allowOrientationDetection = false;
 
@@ -226,6 +229,9 @@ void UnitySetAllowOrientationDetection(bool allow)
 
 UIActivityIndicatorView*	_activityIndicator	= nil;
 UIImageView*				_splashView			= nil;
+
+bool						_splashPortrait  	= true;
+bool						_splashShowing 		= false;
 
 
 class KeyboardOnScreen
@@ -408,51 +414,53 @@ void PresentContext_UnityCallback(struct UnityFrameStats const* unityFrameStats)
 	Profiler_FrameStart();
 }
 
-
-void CreateSplashView( UIView* parentView )
+NSString* SplashViewImage(UIInterfaceOrientation orient)
 {
-	NSString* launchImageName = nil;
-	if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone)
-	{
-		bool devicePortrait  = UIDeviceOrientationIsPortrait([[UIDevice currentDevice] orientation]);
-		bool deviceLandscape = UIDeviceOrientationIsLandscape([[UIDevice currentDevice] orientation]);
-
-		NSArray* supportedOrientation = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"UISupportedInterfaceOrientations"];
-		bool rotateToPortrait  =   [supportedOrientation containsObject: @"UIInterfaceOrientationPortrait"]
-								|| [supportedOrientation containsObject: @"UIInterfaceOrientationPortraitUpsideDown"];
-		bool rotateToLandscape =   [supportedOrientation containsObject: @"UIInterfaceOrientationLandscapeLeft"]
-								|| [supportedOrientation containsObject: @"UIInterfaceOrientationLandscapeRight"];
-
-
-		if (devicePortrait && rotateToPortrait)
-			launchImageName = @"Default-Portrait.png";
-		else if (deviceLandscape && rotateToLandscape)
-			launchImageName = @"Default-Landscape.png";
-		else if (rotateToPortrait)
-			launchImageName = @"Default-Portrait.png";
-		else
-			launchImageName = @"Default-Landscape.png";
-	}
-	else
-	{
+    bool need2xSplash = false;
 #ifdef __IPHONE_4_0
-		if ( [[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [UIScreen mainScreen].scale > 1.0 )
-			launchImageName = @"Default@2x.png";
-		else
+    if ( [[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [UIScreen mainScreen].scale > 1.0 )
+        need2xSplash = true;
 #endif
-			launchImageName = @"Default.png";
-	}
 
-	_splashView = [ [UIImageView alloc] initWithFrame: [[UIScreen mainScreen] bounds] ];
-	_splashView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	_splashView.autoresizesSubviews = YES;
-	_splashView.image = [UIImage imageNamed:launchImageName];
+    bool needOrientedSplash = false;
+    bool needPortraitSplash = true;
 
-	[parentView addSubview:_splashView];
+    if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone)
+    {
+        bool devicePortrait  = UIDeviceOrientationIsPortrait(orient);
+        bool deviceLandscape = UIDeviceOrientationIsLandscape(orient);
+
+        NSArray* supportedOrientation = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"UISupportedInterfaceOrientations"];
+        bool rotateToPortrait  =   [supportedOrientation containsObject: @"UIInterfaceOrientationPortrait"]
+                                || [supportedOrientation containsObject: @"UIInterfaceOrientationPortraitUpsideDown"];
+        bool rotateToLandscape =   [supportedOrientation containsObject: @"UIInterfaceOrientationLandscapeLeft"]
+                                || [supportedOrientation containsObject: @"UIInterfaceOrientationLandscapeRight"];
+
+
+        needOrientedSplash = true;
+        if (devicePortrait && rotateToPortrait)
+            needPortraitSplash = true;
+        else if (deviceLandscape && rotateToLandscape)
+            needPortraitSplash = false;
+        else if (rotateToPortrait)
+            needPortraitSplash = true;
+        else
+            needPortraitSplash = false;
+    }
+
+    const char* portraitSuffix  = needOrientedSplash ? "-Portrait" : "";
+    const char* landscapeSuffix = needOrientedSplash ? "-Landscape" : "";
+
+    const char* szSuffix        = need2xSplash ? "@2x" : "";
+    const char* orientSuffix    = needPortraitSplash ? portraitSuffix : landscapeSuffix;
+
+    return [NSString stringWithFormat:@"Default%s%s", orientSuffix, szSuffix];
 }
 
 void RemoveSplashScreen()
 {
+	_splashShowing = false;
+
 	[_splashView removeFromSuperview];
 	[_splashView release];
 	_splashView = nil;
@@ -478,7 +486,9 @@ int OpenEAGL_UnityCallback(UIWindow** window, int* screenWidth, int* screenHeigh
 	_window = [[UIWindow alloc] initWithFrame:rect];
 	EAGLView* view = [[EAGLView alloc] initWithFrame:rect];
 	UnityViewController *controller = [[UnityViewController alloc] init];
+
 	sGLViewController = controller;
+	sGLView	= view;
 
 #if defined(__IPHONE_3_0)
 	if( _ios30orNewer )
@@ -487,7 +497,27 @@ int OpenEAGL_UnityCallback(UIWindow** window, int* screenWidth, int* screenHeigh
 
 	controller.view = view;
 
-	CreateSplashView( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone ? (UIView*)_window : (UIView*)view );
+	_splashView = [ [UIImageView alloc] initWithFrame: [[UIScreen mainScreen] bounds] ];
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+	{
+		_splashView.image = [UIImage imageNamed:SplashViewImage(UIInterfaceOrientationPortrait)];
+	}
+	else
+	{
+		_splashView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+		_splashView.autoresizesSubviews = YES;
+	}
+
+#ifdef __IPHONE_4_0
+	if(   [_splashView respondsToSelector:@selector(setContentScaleFactor:)]
+	   && [[UIScreen mainScreen] respondsToSelector:@selector(scale)]
+	  )
+		[ _splashView setContentScaleFactor: [UIScreen mainScreen].scale ];
+#endif
+
+
+	[view addSubview:_splashView];
+
 	CreateActivityIndicator(_splashView);
 
 	// add only now so controller have chance to reorient *all* added views
@@ -495,11 +525,9 @@ int OpenEAGL_UnityCallback(UIWindow** window, int* screenWidth, int* screenHeigh
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
 		[_window bringSubviewToFront:_splashView];
 
-	if( !UnityUseOSAutorotation() )
-	{
-		_autorotEnableHandling = true;
-		[[NSNotificationCenter defaultCenter] postNotificationName: UIDeviceOrientationDidChangeNotification object: [UIDevice currentDevice]];
-	}
+	_autorotEnableHandling = true;
+	[[NSNotificationCenter defaultCenter] postNotificationName: UIDeviceOrientationDidChangeNotification object: [UIDevice currentDevice]];
+
 
 	// reposition activity indicator after we rotated views
 	if (_activityIndicator)
@@ -630,8 +658,7 @@ ShouldHandleRotation( ScreenOrientation* outTargetOrient )
 void
 HandleOrientationRequest()
 {
-	UnityViewController*	controller	= (UnityViewController*)UnityGetGLViewController();
-	EAGLView*				view		= (EAGLView*)[controller view];
+	EAGLView* view = (EAGLView*)UnityGetGLView();
 
 	ScreenOrientation targetOrient = portrait;
 	if( ShouldHandleRotation(&targetOrient) )
@@ -678,7 +705,7 @@ HandleOrientationRequest()
 void NotifyFramerateChange(int targetFPS)
 {
 	if( targetFPS <= 0 )
-		return;
+		targetFPS = 60;
 
 #if USE_DISPLAY_LINK_IF_AVAILABLE
 	if (_displayLink)
@@ -738,7 +765,7 @@ void NotifyFramerateChange(int targetFPS)
 {
 	if( _surface.renderbuffer == 0 )
 	{
-		CreateSurface( (EAGLView*)[UnityGetGLViewController() view], &_surface);
+		CreateSurface((EAGLView*)UnityGetGLView(), &_surface);
 
 		// to avoid black screen creeping in - redraw once (second time + present will be in normal Repaint flow)
 		_skipPresent = true;
@@ -842,6 +869,14 @@ void NotifyFramerateChange(int targetFPS)
 	Profiler_InitProfiler();
 	InitGLES();
 
+    _unityLevelReady = true;
+
+	if( _activityIndicator )
+		[_activityIndicator stopAnimating];
+	RemoveSplashScreen();
+
+	[[NSNotificationCenter defaultCenter] postNotificationName: UIDeviceOrientationDidChangeNotification object: [UIDevice currentDevice]];
+
 	_displayLink = nil;
 #if USE_DISPLAY_LINK_IF_AVAILABLE
 	// A system version of 3.1 or greater is required to use CADisplayLink. The NSTimer
@@ -879,16 +914,11 @@ void NotifyFramerateChange(int targetFPS)
 #endif
 	}
 
-	if( _activityIndicator )
-		[_activityIndicator stopAnimating];
-	RemoveSplashScreen();
-
 	// immediately render 1st frame in order to avoid occasional black screen
 	// we do it twice to fill both buffers with meaningful contents.
 	// set proper orientation right away?
 	[self Repaint];
 	[self Repaint];
-
 }
 
 
@@ -934,11 +964,12 @@ void NotifyFramerateChange(int targetFPS)
 
 - (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions
 {
-	//	Initialize Crittercism so we can see unity startup crashes
-	Crittercism_Init(kCrittercism_App, kCrittercism_Key, kCrittercism_Secret);
-	
 	printf_console("-> applicationDidFinishLaunching()\n");
-	// get local notification
+
+	//	Initialize Crittercism so we can see unity startup crashes
+	Crittercism_EnableWithAppID(kCrittercism_App);//, kCrittercism_Key, kCrittercism_Secret);
+    
+    // get local notification
 	if (&UIApplicationLaunchOptionsLocalNotificationKey != nil)
 	{
 		UILocalNotification *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
@@ -1039,50 +1070,72 @@ void NotifyFramerateChange(int targetFPS)
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
 	EnabledOrientation targetAutorot   = kAutorotateToPortrait;
-	ScreenOrientation  targetOrient    = ConvertToUnityScreenOrientation(interfaceOrientation, &targetAutorot);
-	ScreenOrientation  requestedOrientation = UnityRequestedScreenOrientation();
+    ScreenOrientation  targetOrient    = ConvertToUnityScreenOrientation(interfaceOrientation, &targetAutorot);
+    ScreenOrientation  requestedOrientation = UnityRequestedScreenOrientation();
 
-	if (requestedOrientation != autorotation)
-		return (requestedOrientation == targetOrient);
+    if (requestedOrientation != autorotation)
+        return (requestedOrientation == targetOrient);
 
-	if (UnityIsOrientationEnabled(targetAutorot))
-	{
-		_autorotOrientation = targetOrient;
-
-		if (_allowOrientationDetection)
-		{
-			return true;
-		}
-
-		if (UnityUseOSAutorotation() || !_autorotEnableHandling)
-		{
-			return true;
-		}
-	}
-
-	return false;
+    return UnityIsOrientationEnabled(targetAutorot);
 }
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
 	_curOrientation = ConvertToUnityScreenOrientation(toInterfaceOrientation, 0);
-	[[NSNotificationCenter defaultCenter] postNotificationName:kUnityViewWillRotate object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kUnityViewWillRotate object:self];
+
+    if(_splashView || !UnityUseOSAutorotation())
+        [UIView setAnimationsEnabled:NO];
+
+    if(_splashView && UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone)
+        _splashView.image = [UIImage imageNamed:SplashViewImage(toInterfaceOrientation)];
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-	UnitySetScreenOrientation(_curOrientation);
-	ScreenOrientation prevOrientation = ConvertToUnityScreenOrientation(fromInterfaceOrientation, 0);
+	if( _splashView )
+    {
+        if( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone )
+        {
+            if( _curOrientation == landscapeLeft || _curOrientation == landscapeRight )
+            {
+                // we want to rotate *back*
+                _splashView.transform = TransformForOrientation(_curOrientation == landscapeRight ? landscapeLeft : landscapeRight);
 
-	if( OrientationWillChangeSurfaceExtents(prevOrientation, _curOrientation) || _allowOrientationDetection )
-	{
-		if( _glesContextCreated )
-			DestroySurface(&_surface);
-	}
+                CGRect rect  = [[UIScreen mainScreen] bounds];
+                _splashView.bounds    = rect;
+                _splashView.center    = CGPointMake(rect.size.height/2, rect.size.width/2);
+            }
+        }
+    }
 
-	UnitySetAllowOrientationDetection(false);
+    if (_activityIndicator)
+        _activityIndicator.center = CGPointMake([self.view bounds].size.width/2, [self.view bounds].size.height/2);
 
-	[[NSNotificationCenter defaultCenter] postNotificationName:kUnityViewDidRotate object:self];
+    UnitySetScreenOrientation(_curOrientation);
+    if( OrientationWillChangeSurfaceExtents( ConvertToUnityScreenOrientation(fromInterfaceOrientation,0), _curOrientation ) )
+    {
+        if( _glesContextCreated )
+        {
+            DestroySurface(&_surface);
+            CreateSurface((EAGLView*)UnityGetGLView(), &_surface);
+
+            if(_unityLevelReady)
+            {
+                _skipPresent = true;
+                UnityPlayerLoop();
+                UnityPlayerLoop();
+                UnityFinishRendering();
+                _skipPresent = false;
+                PresentSurface(&_surface);
+            }
+        }
+    }
+
+    if( _splashView || !UnityUseOSAutorotation() )
+        [UIView setAnimationsEnabled:YES];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:kUnityViewDidRotate object:self];
 }
 
 @end

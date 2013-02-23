@@ -15,12 +15,9 @@
 
 //	The IDs will be pulled from CrittercismIDs.plist in the main bundle if this file exists
 const char* kCrittercism_App	= "";	//	Your App ID Here
-const char* kCrittercism_Key	= "";	//	Your App Key Here
-const char* kCrittercism_Secret	= "";	//	Your App Secret Here
 
 //	Crittercism Call into library for init
-extern "C" void Crittercism_Init(const char* appID, const char* key, const char* secret);
-
+extern "C" void Crittercism_EnableWithAppID(const char* appID);//, const char* key, const char* secret);
 
 // USE_DISPLAY_LINK_IF_AVAILABLE
 //
@@ -37,6 +34,7 @@ extern "C" void Crittercism_Init(const char* appID, const char* key, const char*
 // run-time automatically and you CAN compile your application using ANY SDK.
 // Your application will work succesfully on pre 3.1 device too.
 //
+// Constants supported by this method: kFPS
 
 
 // Fallback types (for pre 3.1 devices):
@@ -48,7 +46,7 @@ extern "C" void Crittercism_Init(const char* appID, const char* key, const char*
 // which favours battery life and scrupulous correct events processing over the
 // rendering performance.
 //
-// Constants supported by this method: kThrottleFPS
+// Constants supported by this method: kThrottleFPS, kFPS
 
 
 // THREAD_BASED_LOOP
@@ -60,6 +58,7 @@ extern "C" void Crittercism_Init(const char* appID, const char* key, const char*
 // Thread based loop allows to get best of two worlds - fast rendering and
 // guaranteed event processing.
 //
+// Constants supported by this method: kFPS
 
 
 // EVENT_PUMP_BASED_LOOP
@@ -69,11 +68,15 @@ extern "C" void Crittercism_Init(const char* appID, const char* key, const char*
 // maybe missing, therefore you must carefully tweak
 // kMillisecondsPerFrameToProcessEvents to achieve desired responsivness.
 //
-// Constants supported by this method: kMillisecondsPerFrameToProcessEvents
+// Constants supported by this method: kMillisecondsPerFrameToProcessEvents, kFPS
 
 
 // Constants:
 //
+// kFPS - allows you to set desired framerate in frames per second. Set to 30 by
+// default. Normally game will not run faster than specified by kFPS. Note that
+// iPhone device can not render faster than 60 frames per second.
+
 // kThrottleFPS - usually you need to boost NSTimer approach a bit to get any
 // decent performance. Set to 2 by default. Meaningful only if
 // NSTIMER_BASED_LOOP method is used.
@@ -111,17 +114,15 @@ extern "C" void Crittercism_Init(const char* appID, const char* key, const char*
 #define kMillisecondsPerFrameToProcessEvents	3
 #endif
 
-// kFPS define for removed
-// you can use Application.targetFrameRate (30 fps by default)
+#define kFPS									30.0
+#define kAccelerometerFrequency					60.0
 
 // Time to process events in seconds.
 // Only used when display link loop is enabled.
 #define kInputProcessingTime					0.001
 
-extern "C" __attribute__((visibility ("default"))) NSString * const kUnityViewWillRotate = @"kUnityViewWillRotate";
-extern "C" __attribute__((visibility ("default"))) NSString * const kUnityViewDidRotate = @"kUnityViewDidRotate";
 
-// --- Unity ------------------------------------------------------------------
+// --- Unity -------------------------------------------------------------------
 //
 
 enum EnabledOrientation
@@ -148,7 +149,6 @@ enum ScreenOrientation
 void UnityPlayerLoop();
 void UnityFinishRendering();
 void UnityInitApplication(const char* appPathName);
-void UnityLoadApplication();
 void UnityPause(bool pause);
 void UnityReloadResources();
 void UnitySetAudioSessionActive(bool active);
@@ -158,21 +158,16 @@ void UnitySendTouchesBegin(NSSet* touches, UIEvent* event);
 void UnitySendTouchesEnded(NSSet* touches, UIEvent* event);
 void UnitySendTouchesCancelled(NSSet* touches, UIEvent* event);
 void UnitySendTouchesMoved(NSSet* touches, UIEvent* event);
-void UnitySendLocalNotification(UILocalNotification* notification);
-void UnitySendRemoteNotification(NSDictionary* notification);
-void UnitySendDeviceToken(NSData* deviceToken);
-void UnitySendRemoteNotificationError(NSError* error);
 void UnityDidAccelerate(float x, float y, float z, NSTimeInterval timestamp);
 void UnityInputProcess();
 bool UnityIsRenderingAPISupported(int renderingApi);
 void UnitySetInputScaleFactor(float scale);
 float UnityGetInputScaleFactor();
-int  UnityGetTargetFPS();
 
 bool UnityIsOrientationEnabled(EnabledOrientation orientation);
 void UnitySetScreenOrientation(ScreenOrientation orientation);
 ScreenOrientation UnityRequestedScreenOrientation();
-ScreenOrientation ConvertToUnityScreenOrientation(UIInterfaceOrientation hwOrient, EnabledOrientation* outAutorotOrient);
+//ScreenOrientation ConvertToUnityScreenOrientation(UIInterfaceOrientation hwOrient, EnabledOrientation* outAutorotOrient);
 bool UnityUseOSAutorotation();
 
 bool UnityUse32bitDisplayBuffer();
@@ -181,8 +176,6 @@ void	UnityKeyboardOrientationStep1();
 void	UnityKeyboardOrientationStep2();
 
 int 	UnityGetDesiredMSAASampleCount(int defaultSampleCount);
-int 	UnityGetShowActivityIndicatorOnLoading();
-int		UnityGetAccelerometerFrequency();
 
 enum TargetResolution
 {
@@ -211,6 +204,8 @@ bool	_supportsMSAA 		= false;
 
 EAGLSurfaceDesc	_surface;
 
+
+
 ScreenOrientation	_curOrientation			= portrait;
 ScreenOrientation	_autorotOrientation		= kScreenOrientationUnknown;
 bool				_autorotEnableHandling	= false;
@@ -222,10 +217,6 @@ void UnitySetAllowOrientationDetection(bool allow)
 {
 	_allowOrientationDetection = allow;
 }
-
-
-UIActivityIndicatorView*	_activityIndicator	= nil;
-UIImageView*				_splashView			= nil;
 
 
 class KeyboardOnScreen
@@ -264,9 +255,7 @@ typedef EAGLContext*	MyEAGLContext;
 
 MyEAGLContext			_context;
 UIWindow *				_window;
-
 NSTimer*				_timer;
-bool					_need_recreate_timer = false;
 id						_displayLink;
 BOOL					_accelerometerIsActive = NO;
 // This is set to true when applicationWillResignActive gets called. It is here
@@ -292,40 +281,27 @@ bool CreateWindowSurface(EAGLView *view, GLuint format, GLuint depthFormat, GLui
 	surface->msaaFramebuffer = 0;
 	surface->msaaRenderbuffer = 0;
 	surface->msaaDepthbuffer = 0;
-	surface->msaaSamples = _supportsMSAA ? msaaSamples : 0;
-	surface->use32bitColor = UnityUse32bitDisplayBuffer();
+	surface->msaaSamples = msaaSamples;
 
-	surface->eaglLayer = eaglLayer;
+	const NSString* colorFormat = UnityUse32bitDisplayBuffer() ? kEAGLColorFormatRGBA8 : kEAGLColorFormatRGB565;
+
+	eaglLayer.opaque = YES;
+	eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+									[NSNumber numberWithBool:FALSE], kEAGLDrawablePropertyRetainedBacking, colorFormat, kEAGLDrawablePropertyColorFormat, nil];
+
 
 	return CreateSurface(view, &_surface);
 }
 
-extern "C" void InitEAGLLayer(void* eaglLayer, bool use32bitColor)
-{
-	CAEAGLLayer* layer = (CAEAGLLayer*)eaglLayer;
 
-	const NSString* colorFormat = use32bitColor ? kEAGLColorFormatRGBA8 : kEAGLColorFormatRGB565;
-
-	layer.opaque = YES;
-	layer.drawableProperties =	[NSDictionary dictionaryWithObjectsAndKeys:
-									[NSNumber numberWithBool:FALSE], kEAGLDrawablePropertyRetainedBacking,
-									colorFormat, kEAGLDrawablePropertyColorFormat,
-									nil
-								];
-}
 extern "C" bool AllocateRenderBufferStorageFromEAGLLayer(void* eaglLayer)
 {
 	return [_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:(CAEAGLLayer*)eaglLayer];
 }
-extern "C" void DeallocateRenderBufferStorageFromEAGLLayer()
-{
-	[_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:nil];
-}
 
 bool CreateSurface(EAGLView *view, EAGLSurfaceDesc* surface)
 {
-	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)surface->eaglLayer;
-	assert(eaglLayer == [view layer]);
+	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 
 	CGSize newSize = [eaglLayer bounds].size;
 	newSize.width  = roundf(newSize.width);
@@ -334,24 +310,32 @@ bool CreateSurface(EAGLView *view, EAGLSurfaceDesc* surface)
 #ifdef __IPHONE_4_0
     int resolution = UnityGetTargetResolution();
 
-    if (    (resolution == kTargetResolutionNative || resolution == kTargetResolutionHD)
-    	 && [view respondsToSelector:@selector(setContentScaleFactor:)]
-    	 && [[UIScreen mainScreen] respondsToSelector:@selector(scale)]
-       )
+    if (resolution == kTargetResolutionNative ||
+        resolution == kTargetResolutionHD)
     {
-			CGFloat scaleFactor = [UIScreen mainScreen].scale;
-			[view setContentScaleFactor:scaleFactor];
-			newSize.width = roundf(newSize.width * scaleFactor);
-			newSize.height = roundf(newSize.height * scaleFactor);
-			UnitySetInputScaleFactor(scaleFactor);
+        if ([view respondsToSelector:@selector(setContentScaleFactor:)])
+        {
+            UIScreen* mainScreen = [UIScreen mainScreen];
+            CGFloat scaleFactor = mainScreen.scale;
+            [view setContentScaleFactor:scaleFactor];
+            newSize.width = roundf(newSize.width * scaleFactor);
+            newSize.height = roundf(newSize.height * scaleFactor);
+            UnitySetInputScaleFactor(scaleFactor);
+        }
     }
 #endif
 
 	surface->w = newSize.width;
 	surface->h = newSize.height;
 
-	UNITY_DBG_LOG ("CreateWindowSurface: FBO\n");
-	CreateSurfaceGLES(surface);
+	UNITY_DBG_LOG ("CreateWindowSurface: create non-AA FBO\n");
+	CreateSurfaceGLES(surface, eaglLayer);
+
+	if (!_supportsMSAA)
+		surface->msaaSamples = 0;
+
+	CreateSurfaceMultisampleBuffersGLES(surface);
+
 	GLES_CHK( glBindRenderbufferOES(GL_RENDERBUFFER_OES, surface->renderbuffer) );
 
 	return true;
@@ -409,67 +393,6 @@ void PresentContext_UnityCallback(struct UnityFrameStats const* unityFrameStats)
 }
 
 
-void CreateSplashView( UIView* parentView )
-{
-	NSString* launchImageName = nil;
-	if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone)
-	{
-		bool devicePortrait  = UIDeviceOrientationIsPortrait([[UIDevice currentDevice] orientation]);
-		bool deviceLandscape = UIDeviceOrientationIsLandscape([[UIDevice currentDevice] orientation]);
-
-		NSArray* supportedOrientation = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"UISupportedInterfaceOrientations"];
-		bool rotateToPortrait  =   [supportedOrientation containsObject: @"UIInterfaceOrientationPortrait"]
-								|| [supportedOrientation containsObject: @"UIInterfaceOrientationPortraitUpsideDown"];
-		bool rotateToLandscape =   [supportedOrientation containsObject: @"UIInterfaceOrientationLandscapeLeft"]
-								|| [supportedOrientation containsObject: @"UIInterfaceOrientationLandscapeRight"];
-
-
-		if (devicePortrait && rotateToPortrait)
-			launchImageName = @"Default-Portrait.png";
-		else if (deviceLandscape && rotateToLandscape)
-			launchImageName = @"Default-Landscape.png";
-		else if (rotateToPortrait)
-			launchImageName = @"Default-Portrait.png";
-		else
-			launchImageName = @"Default-Landscape.png";
-	}
-	else
-	{
-#ifdef __IPHONE_4_0
-		if ( [[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [UIScreen mainScreen].scale > 1.0 )
-			launchImageName = @"Default@2x.png";
-		else
-#endif
-			launchImageName = @"Default.png";
-	}
-
-	_splashView = [ [UIImageView alloc] initWithFrame: [[UIScreen mainScreen] bounds] ];
-	_splashView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	_splashView.autoresizesSubviews = YES;
-	_splashView.image = [UIImage imageNamed:launchImageName];
-
-	[parentView addSubview:_splashView];
-}
-
-void RemoveSplashScreen()
-{
-	[_splashView removeFromSuperview];
-	[_splashView release];
-	_splashView = nil;
-}
-
-void CreateActivityIndicator(UIView* parentView)
-{
-	int activityIndicatorStyle = UnityGetShowActivityIndicatorOnLoading();
-	if( activityIndicatorStyle >= 0)
-	{
-		_activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyle)activityIndicatorStyle];
-		[parentView addSubview:_activityIndicator];
-	}
-}
-
-
-
 int OpenEAGL_UnityCallback(UIWindow** window, int* screenWidth, int* screenHeight,  int* openglesVersion)
 {
 	CGRect rect = [[UIScreen mainScreen] bounds];
@@ -486,24 +409,14 @@ int OpenEAGL_UnityCallback(UIWindow** window, int* screenWidth, int* screenHeigh
 #endif
 
 	controller.view = view;
-
-	CreateSplashView( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone ? (UIView*)_window : (UIView*)view );
-	CreateActivityIndicator(_splashView);
-
-	// add only now so controller have chance to reorient *all* added views
 	[_window addSubview:view];
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-		[_window bringSubviewToFront:_splashView];
+
 
 	if( !UnityUseOSAutorotation() )
 	{
 		_autorotEnableHandling = true;
 		[[NSNotificationCenter defaultCenter] postNotificationName: UIDeviceOrientationDidChangeNotification object: [UIDevice currentDevice]];
 	}
-
-	// reposition activity indicator after we rotated views
-	if (_activityIndicator)
-		_activityIndicator.center = CGPointMake([_splashView bounds].size.width/2, [_splashView bounds].size.height/2);
 
 	int openglesApi =
 #if defined(__IPHONE_3_0) && USE_OPENGLES20_IF_AVAILABLE
@@ -559,9 +472,6 @@ ConvertToIosScreenOrientation(ScreenOrientation orient)
 		// though unity docs are adjusted with device orientation values, so swap here
 		case landscapeLeft:			return UIInterfaceOrientationLandscapeRight;
 		case landscapeRight:		return UIInterfaceOrientationLandscapeLeft;
-
-		// shouldn't got there, just shutting up compiler
-		default:					return UIInterfaceOrientationPortrait;
 	}
 
 	return UIInterfaceOrientationPortrait;
@@ -675,27 +585,6 @@ HandleOrientationRequest()
 	}
 }
 
-void NotifyFramerateChange(int targetFPS)
-{
-	if( targetFPS <= 0 )
-		return;
-
-#if USE_DISPLAY_LINK_IF_AVAILABLE
-	if (_displayLink)
-	{
-		int animationFrameInterval = (60.0 / (targetFPS));
-		if (animationFrameInterval < 1)
-			animationFrameInterval = 1;
-
-		[_displayLink setFrameInterval:animationFrameInterval];
-	}
-#endif
-#if FALLBACK_LOOP_TYPE == NSTIMER_BASED_LOOP
-	if (_displayLink == 0 && _timer)
-		_need_recreate_timer = true;
-#endif
-}
-
 
 
 // --- AppController --------------------------------------------------------------------
@@ -711,11 +600,10 @@ void NotifyFramerateChange(int targetFPS)
 	// work-around reported by Brian Robbins
 
 	[[UIAccelerometer sharedAccelerometer] setDelegate:nil];
-	int frequency = UnityGetAccelerometerFrequency();
 
-	if (frequency > 0)
+	if (kAccelerometerFrequency > 1e-6)
 	{
-		const float accelerometerFrequency = frequency;
+		const float accelerometerFrequency = kAccelerometerFrequency;
 		[[UIAccelerometer sharedAccelerometer] setUpdateInterval:(1.0 / accelerometerFrequency)];
 		[[UIAccelerometer sharedAccelerometer] setDelegate:self];
 	}
@@ -736,17 +624,6 @@ void NotifyFramerateChange(int targetFPS)
 
 - (void) Repaint
 {
-	if( _surface.renderbuffer == 0 )
-	{
-		CreateSurface( (EAGLView*)[UnityGetGLViewController() view], &_surface);
-
-		// to avoid black screen creeping in - redraw once (second time + present will be in normal Repaint flow)
-		_skipPresent = true;
-		UnityPlayerLoop();
-		UnityFinishRendering();
-		_skipPresent = false;
-	}
-
 	Profiler_UnityLoopStart();
 
 	UnityInputProcess();
@@ -757,7 +634,7 @@ void NotifyFramerateChange(int targetFPS)
 	// TODO: maybe repaint is not the best place?
 	HandleOrientationRequest();
 
-	if (UnityGetAccelerometerFrequency() > 0 && (!_accelerometerIsActive || ([UIAccelerometer sharedAccelerometer].delegate == nil)))
+	if (kAccelerometerFrequency > 1e-6 && (!_accelerometerIsActive || ([UIAccelerometer sharedAccelerometer].delegate == nil)))
 	{
 		static int frameCounter = 0;
 		if (frameCounter <= 0)
@@ -772,29 +649,18 @@ void NotifyFramerateChange(int targetFPS)
 		}
 		--frameCounter;
 	}
-
-#if FALLBACK_LOOP_TYPE == NSTIMER_BASED_LOOP
-	if (_displayLink == 0 && _timer && _need_recreate_timer)
-	{
-		[_timer invalidate];
-		_timer = [NSTimer scheduledTimerWithTimeInterval:(1.0 / (UnityGetTargetFPS() * kThrottleFPS)) target:self selector:@selector(Repaint) userInfo:nil repeats:YES];
-
-		_need_recreate_timer = false;
-	}
-#endif
-
 }
 
-- (void) startRendering
+- (void) startRendering:(UIApplication*)application
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 #if FALLBACK_LOOP_TYPE == THREAD_BASED_LOOP
+	const double SecondsPerFrame = 1.0 / (((kFPS) > 60.0)? 60.0: (kFPS));
 	const double OneMillisecond = 1.0 / 1000.0;
 	for (;;)
 	{
-		const double SecondsPerFrame = 1.0 / (float)UnityGetTargetFPS();
-		const double frameStartTime  = (double)CFAbsoluteTimeGetCurrent();
+		double frameStartTime = (double)CFAbsoluteTimeGetCurrent();
 		[self performSelectorOnMainThread:@selector(Repaint) withObject:nil waitUntilDone:YES];
 
 		double secondsToProcessEvents = SecondsPerFrame - (((double)CFAbsoluteTimeGetCurrent()) - frameStartTime);
@@ -810,10 +676,10 @@ void NotifyFramerateChange(int targetFPS)
 
 	int eventLoopTimeOuts = 0;
 	const double SecondsPerFrameToProcessEvents = 0.001 * (double)kMillisecondsPerFrameToProcessEvents;
+	const double SecondsPerFrame = 1.0 / (((kFPS) > 60.0)? 60.0: (kFPS));
 	for (;;)
 	{
-		const double SecondsPerFrame = 1.0 / (float)UnityGetTargetFPS();
-		const double frameStartTime  = (double)CFAbsoluteTimeGetCurrent();
+		double frameStartTime = (double)CFAbsoluteTimeGetCurrent();
 		[self Repaint];
 
 		if (kMillisecondsPerFrameToProcessEvents <= 0)
@@ -832,65 +698,8 @@ void NotifyFramerateChange(int targetFPS)
 	}
 
 #endif
-
 	[pool release];
 }
-
-- (void) prepareRunLoop
-{
-	UnityLoadApplication();
-	Profiler_InitProfiler();
-	InitGLES();
-
-	_displayLink = nil;
-#if USE_DISPLAY_LINK_IF_AVAILABLE
-	// A system version of 3.1 or greater is required to use CADisplayLink. The NSTimer
-	// class is used as fallback when it isn't available.
-	if (_ios31orNewer)
-	{
-		// Frame interval defines how many display frames must pass between each time the
-		// display link fires.
-		int animationFrameInterval = 60.0 / (float)UnityGetTargetFPS();
-		assert(animationFrameInterval >= 1);
-
-		_displayLink = [NSClassFromString(@"CADisplayLink") displayLinkWithTarget:self selector:@selector(RepaintDisplayLink)];
-		[_displayLink setFrameInterval:animationFrameInterval];
-		[_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-	}
-#endif
-
-	if (_displayLink == nil)
-	{
-#if FALLBACK_LOOP_TYPE == NSTIMER_BASED_LOOP
-		_timer = [NSTimer scheduledTimerWithTimeInterval:(1.0 / (UnityGetTargetFPS() * kThrottleFPS)) target:self selector:@selector(Repaint) userInfo:nil repeats:YES];
-#endif
-	}
-
-	[self registerAccelerometer];
-
-	KeyboardOnScreen::Init();
-
-	if (_displayLink == nil)
-	{
-#if FALLBACK_LOOP_TYPE == THREAD_BASED_LOOP
-		[NSThread detachNewThreadSelector:@selector(startRendering) toTarget:self withObject:nil];
-#elif FALLBACK_LOOP_TYPE == EVENT_PUMP_BASED_LOOP
-		[self performSelectorOnMainThread:@selector(startRendering) withObject:nil waitUntilDone:NO];
-#endif
-	}
-
-	if( _activityIndicator )
-		[_activityIndicator stopAnimating];
-	RemoveSplashScreen();
-
-	// immediately render 1st frame in order to avoid occasional black screen
-	// we do it twice to fill both buffers with meaningful contents.
-	// set proper orientation right away?
-	[self Repaint];
-	[self Repaint];
-
-}
-
 
 - (void) startUnity:(UIApplication*)application
 {
@@ -905,65 +714,65 @@ void NotifyFramerateChange(int targetFPS)
 
 	char const* appPath = [[[NSBundle mainBundle] bundlePath]UTF8String];
 	UnityInitApplication(appPath);
+	Profiler_InitProfiler();
+	InitGLES();
 
-	if( _activityIndicator )
-		[_activityIndicator startAnimating];
+	_displayLink = nil;
+#if USE_DISPLAY_LINK_IF_AVAILABLE
+	// A system version of 3.1 or greater is required to use CADisplayLink. The NSTimer
+	// class is used as fallback when it isn't available.
+	if (_ios31orNewer)
+	{
+		// Frame interval defines how many display frames must pass between each time the
+		// display link fires.
+		int animationFrameInterval = (60.0 / (kFPS));
+		if (animationFrameInterval < 1)
+			animationFrameInterval = 1;
 
-	[self performSelector:@selector(prepareRunLoop) withObject:nil afterDelay:0.1];
+		_displayLink = [NSClassFromString(@"CADisplayLink") displayLinkWithTarget:self selector:@selector(RepaintDisplayLink)];
+		[_displayLink setFrameInterval:animationFrameInterval];
+		[_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+	}
+#endif
+
+	if (_displayLink == nil)
+	{
+#if FALLBACK_LOOP_TYPE == NSTIMER_BASED_LOOP
+		_timer = [NSTimer scheduledTimerWithTimeInterval:(1.0 / (kFPS * kThrottleFPS)) target:self selector:@selector(Repaint) userInfo:nil repeats:YES];
+#endif
+	}
+
+	[self registerAccelerometer];
+
+	KeyboardOnScreen::Init();
+
+	if (_displayLink == nil)
+	{
+#if FALLBACK_LOOP_TYPE == THREAD_BASED_LOOP
+		[NSThread detachNewThreadSelector:@selector(startRendering:) toTarget:self withObject:nil];
+#elif FALLBACK_LOOP_TYPE == EVENT_PUMP_BASED_LOOP
+		[self performSelectorOnMainThread:@selector(startRendering:) withObject:application waitUntilDone:NO];
+#endif
+	}
+
+	// immediately render 1st frame in order to avoid occasional black screen
+	// we do it twice to fill both buffers with meaningful contents.
+	// set proper orientation right away?
+	[self Repaint];
+	[self Repaint];
 }
 
-- (void)application:(UIApplication*)application didReceiveLocalNotification:(UILocalNotification*)notification
-{
-	UnitySendLocalNotification(notification);
-}
-
-- (void)application:(UIApplication*)application didReceiveRemoteNotification:(NSDictionary*)userInfo
-{
-	UnitySendRemoteNotification(userInfo);
-}
-
-- (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
-{
-	UnitySendDeviceToken(deviceToken);
-}
-
-- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
-{
-	UnitySendRemoteNotificationError(error);
-}
-
-- (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions
+- (void) applicationDidFinishLaunching:(UIApplication*)application
 {
 	//	Initialize Crittercism so we can see unity startup crashes
-	Crittercism_Init(kCrittercism_App, kCrittercism_Key, kCrittercism_Secret);
+	Crittercism_EnableWithAppID(kCrittercism_App);
 	
 	printf_console("-> applicationDidFinishLaunching()\n");
-	// get local notification
-	if (&UIApplicationLaunchOptionsLocalNotificationKey != nil)
-	{
-		UILocalNotification *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
-		if (notification)
-		{
-			UnitySendLocalNotification(notification);
-		}
-	}
-
-	// get remote notification
-	if (&UIApplicationLaunchOptionsRemoteNotificationKey != nil)
-	{
-		NSDictionary *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
-		if (notification)
-		{
-			UnitySendRemoteNotification(notification);
-		}
-	}
 
 	if ([UIDevice currentDevice].generatesDeviceOrientationNotifications == NO)
 		[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 
 	[self startUnity:application];
-
-	return NO;
 }
 
 // For iOS 4
@@ -1038,51 +847,54 @@ void NotifyFramerateChange(int targetFPS)
 @implementation UnityViewController
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-	EnabledOrientation targetAutorot   = kAutorotateToPortrait;
-	ScreenOrientation  targetOrient    = ConvertToUnityScreenOrientation(interfaceOrientation, &targetAutorot);
-	ScreenOrientation  requestedOrientation = UnityRequestedScreenOrientation();
-
-	if (requestedOrientation != autorotation)
-		return (requestedOrientation == targetOrient);
-
-	if (UnityIsOrientationEnabled(targetAutorot))
-	{
-		_autorotOrientation = targetOrient;
-
-		if (_allowOrientationDetection)
-		{
-			return true;
-		}
-
-		if (UnityUseOSAutorotation() || !_autorotEnableHandling)
-		{
-			return true;
-		}
-	}
+//	EnabledOrientation targetAutorot   = kAutorotateToPortrait;
+    //TODO:FIX
+//	ScreenOrientation  targetOrient    = ConvertToUnityScreenOrientation(interfaceOrientation, &targetAutorot);
+//	ScreenOrientation  requestedOrientation = UnityRequestedScreenOrientation();
+//
+//	if (requestedOrientation != autorotation)
+//		return (requestedOrientation == targetOrient);
+//
+//	if (UnityIsOrientationEnabled(targetAutorot))
+//	{
+//		_autorotOrientation = targetOrient;
+//
+//		if (_allowOrientationDetection)
+//		{
+//			return true;
+//		}
+//
+//		if (UnityUseOSAutorotation() || !_autorotEnableHandling)
+//		{
+//			return true;
+//		}
+//	}
 
 	return false;
 }
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-	_curOrientation = ConvertToUnityScreenOrientation(toInterfaceOrientation, 0);
-	[[NSNotificationCenter defaultCenter] postNotificationName:kUnityViewWillRotate object:self];
+    //TODO:Fix
+	//_curOrientation = ConvertToUnityScreenOrientation(toInterfaceOrientation, 0);
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
 	UnitySetScreenOrientation(_curOrientation);
-	ScreenOrientation prevOrientation = ConvertToUnityScreenOrientation(fromInterfaceOrientation, 0);
+    //TODO:Fix
+	ScreenOrientation prevOrientation = _curOrientation;//ConvertToUnityScreenOrientation(fromInterfaceOrientation, 0);
 
 	if( OrientationWillChangeSurfaceExtents(prevOrientation, _curOrientation) || _allowOrientationDetection )
 	{
 		if( _glesContextCreated )
+		{
 			DestroySurface(&_surface);
+			CreateSurface([self view], &_surface);
+		}
 	}
 
 	UnitySetAllowOrientationDetection(false);
-
-	[[NSNotificationCenter defaultCenter] postNotificationName:kUnityViewDidRotate object:self];
 }
 
 @end
