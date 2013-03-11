@@ -14,12 +14,10 @@
 #include <mach/mach_time.h>
 
 //	The IDs will be pulled from CrittercismIDs.plist in the main bundle if this file exists
-const char* kCrittercism_App	= "4fea23d1c8f9745183000005";	//	Your App ID Here
-const char* kCrittercism_Key	= "hrnel67igbctkul51iecsrxj3w0b";	//	Your App Key Here
-const char* kCrittercism_Secret	= "6tekxnxlwyjuq8mben4zkgbf5ty29o7p";	//	Your App Secret Here
+const char* kCrittercism_App	= "";	//	Your App ID Here
 
 //	Crittercism Call into library for init
-extern "C" void Crittercism_Init(const char* appID, const char* key, const char* secret);
+extern "C" void Crittercism_EnableWithAppID(const char* appID);
 
 // USE_DISPLAY_LINK_IF_AVAILABLE
 //
@@ -964,7 +962,7 @@ void NotifyFramerateChange(int targetFPS)
 - (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions
 {
     //	Initialize Crittercism so we can see unity startup crashes
-	Crittercism_Init(kCrittercism_App, kCrittercism_Key, kCrittercism_Secret);
+	Crittercism_EnableWithAppID(kCrittercism_App);
     
 	printf_console("-> applicationDidFinishLaunching()\n");
 	// get local notification
