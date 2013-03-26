@@ -1,5 +1,5 @@
 //
-//  CrittercismsUnity.mm
+//  CrittercismUnity.mm
 //  CrittercismUnity
 //
 //  Created by Ben Bethel on 3/13/12.
@@ -12,8 +12,8 @@
 //#define DEBUG_LOGS
 #define CUSTOM_EXCEPTION
 #import "Crittercism.h"
-#import "CrittercismsUnity.h"
-#import "CrittercismsExtern.h"
+#import "CrittercismUnity.h"
+#import "CrittercismExtern.h"
 
 
 void signal_handler(int idn);   //  Prototype, just ot kill the warning

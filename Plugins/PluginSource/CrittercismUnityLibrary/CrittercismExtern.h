@@ -1,13 +1,13 @@
 //
-//  CrittercismsExtern.h
+//  CrittercismExtern.h
 //  CrittercismUnity
 //
 //  Created by Ben Bethel on 3/13/12.
 //  Copyright (c) 2012 Flying Wisdom Studios. All rights reserved.
 //
 
-#ifndef CrittercismUnity_CrittercismsExtern_h
-#define CrittercismUnity_CrittercismsExtern_h
+#ifndef CrittercismUnity_CrittercismExtern_h
+#define CrittercismUnity_CrittercismExtern_h
 
 #ifdef __cplusplus
 extern "C" {
