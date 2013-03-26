@@ -46,6 +46,21 @@
 // Retrieve currently stored opt out status.
 + (BOOL)getOptOutStatus;
 
+// Set the maximum number of Crittercism crash reports that will be stored on
+// the local device if the device does not have internet connectivity.  If
+// more than |maxOfflineCrashReports| crashes occur, then the oldest crash
+// will be overwritten. Decreasing the value of this setting will not delete
+// any offline crash reports. Unsent crash reports will be kept until they are
+// sent to the Crittercism server, hence there may be more than
+// |maxOfflineCrashReports| stored on the device for a short period of time.
+//
+// The default value is 3
++ (void)setMaxOfflineCrashReports:(NSUInteger)max;
+
+// Get the maximum number of Crittercism crash reports that will be stored on
+// the local device if the device does not have internet connectivity.
++ (NSUInteger)maxOfflineCrashReports;
+
 // Retrieve the Crittercism generated unique identifier for this device.
 // Note, this is NOT the iPhone's UDID.
 //

@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Crittercism.h>
+
 @protocol CrittercismDelegate <NSObject>
 
 @optional
