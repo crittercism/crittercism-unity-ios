@@ -175,7 +175,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#if [ -f \"$PROJECT_DIR/../CrittercismTestApp/Assets/Plugins/ios/lib$PRODUCT_NAME.a/\" ]\n#then\n#cp -Rf \"$PROJECT_DIR/../CrittercismTestApp/Assets/Plugins/ios/lib$PRODUCT_NAME.a\"\n#fi\n#cp \"$TARGET_BUILD_DIR/lib$PRODUCT_NAME.a\" \"$PROJECT_DIR/../CrittercismTestApp/Assets/Plugins/ios/\"";
+			shellScript = "#if [ -f \"$PROJECT_DIR/../Assets/Plugins/ios/lib$PRODUCT_NAME.a/\" ]\n#then\n#cp -Rf \"$PROJECT_DIR/../Assets/Plugins/ios/lib$PRODUCT_NAME.a\"\n#fi\n#cp \"$TARGET_BUILD_DIR/lib$PRODUCT_NAME.a\" \"$PROJECT_DIR/../CrittercismTestApp/Assets/Plugins/ios/\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
