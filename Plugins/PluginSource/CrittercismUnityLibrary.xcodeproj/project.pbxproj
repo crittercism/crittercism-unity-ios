@@ -17,7 +17,6 @@
 		2C90683B16FA6DD6006F99A4 /* Crittercism.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C90683816FA6DD6006F99A4 /* Crittercism.h */; };
 		2C90683C16FA6DD6006F99A4 /* CrittercismDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C90683916FA6DD6006F99A4 /* CrittercismDelegate.h */; };
 		2C90683D16FA6DD6006F99A4 /* libCrittercism_v3_5_1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C90683A16FA6DD6006F99A4 /* libCrittercism_v3_5_1.a */; };
-		2CED489F16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 2CED489E16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,7 +32,6 @@
 		2C90683816FA6DD6006F99A4 /* Crittercism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crittercism.h; sourceTree = "<group>"; };
 		2C90683916FA6DD6006F99A4 /* CrittercismDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrittercismDelegate.h; sourceTree = "<group>"; };
 		2C90683A16FA6DD6006F99A4 /* libCrittercism_v3_5_1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCrittercism_v3_5_1.a; sourceTree = "<group>"; };
-		2CED489E16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CrittercismUnityLibrary-Prefix.pch"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,7 +95,6 @@
 		1698E23E150FF96100341879 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				2CED489E16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -113,7 +110,6 @@
 				1698E295150FFA0900341879 /* CrittercismUnity.h in Headers */,
 				2C90683B16FA6DD6006F99A4 /* Crittercism.h in Headers */,
 				2C90683C16FA6DD6006F99A4 /* CrittercismDelegate.h in Headers */,
-				2CED489F16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,6 +208,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "";
 				OTHER_CODE_SIGN_FLAGS = "-all_load";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -232,6 +229,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "";
 				OTHER_CODE_SIGN_FLAGS = "-all_load";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -246,7 +244,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				DSTROOT = /tmp/CrittercismUnityLibrary.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "CrittercismUnityLibrary/CrittercismUnityLibrary-Prefix.pch";
+				GCC_PREFIX_HEADER = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -271,7 +269,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				DSTROOT = /tmp/CrittercismUnityLibrary.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "CrittercismUnityLibrary/CrittercismUnityLibrary-Prefix.pch";
+				GCC_PREFIX_HEADER = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
