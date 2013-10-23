@@ -9,8 +9,9 @@
 
 #define VERSION_3
 //#define VERSION_2
-//#define DEBUG_LOGS
+#define DEBUG_LOGS
 #define CUSTOM_EXCEPTION
+//#define USE_C_SAVE
 #import "Crittercism.h"
 #import "CrittercismUnity.h"
 #import "CrittercismExtern.h"
@@ -205,9 +206,11 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
     if(mException == NULL)
     {
 #ifdef CUSTOM_EXCEPTION
+        NSDictionary *exceptionDic = [[NSDictionary alloc]
+                                      initWithObjectsAndKeys:@"exception", [NSString stringWithFormat:@"%@\n%@", mExceptionDescription, mCallStack] , nil];
         mException  = [[CrittercismException alloc]initWithName:mExceptionName
                         reason:mExceptionDescription 
-                        userInfo:[NSString stringWithFormat:@"%@\n%@", mExceptionDescription, mCallStack] 
+                        userInfo:exceptionDic
                         callstack:mCallStack];
 #else
         mException  = [[NSException alloc]initWithName:mExceptionName
@@ -589,7 +592,7 @@ void Crittercism_SetValue(const char* value, const char* key)
     str = [str stringByDecodingURLFormat];
     
     NSString *str1   = [NSString stringWithUTF8String:key];
-    str1 = [str stringByDecodingURLFormat];
+    str1 = [str1 stringByDecodingURLFormat];
     
     [Crittercism setValue:str forKey:str1];
 }
@@ -613,7 +616,7 @@ void Crittercism_SetLogValue(const char *key, const char *value)
     str = [str stringByDecodingURLFormat];
     
     NSString *str1   = [NSString stringWithUTF8String:key];
-    str1 = [str stringByDecodingURLFormat];
+    str1 = [str1 stringByDecodingURLFormat];
     
     [_ExceptionGenerator AddLogValue:str key:str1];
 }
