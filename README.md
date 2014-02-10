@@ -7,7 +7,7 @@ Overview
 
 * **Unhandled Exception Tracking** When an unhandled exception occurs, the library records device state and a stack trace for immediate/delayed (depending on platform) transmission to Crittercism. Crittercism informs the developer of the error, and provides the information necessary to reproduce the issue in local development / testing.
 
-In addition to crash reporting, the library provides calls for setting timestamped checkpoints (or [Breadcrumbs][10]), recording arbitrary user state (or [Metadata][11]), and saving stack traces with developer-provided messages on arbitrary code paths (or [Handled Exceptions][9]).
+In addition to crash reporting, the library provides calls for setting timestamped checkpoints (or Breadcrumbs), recording arbitrary user state (or Metadata]), and saving stack traces with developer-provided messages on arbitrary code paths (or Handled Exceptions).
 
 Learn more about what Crittercism provides with the [solution overview][14].
 
@@ -59,7 +59,7 @@ Make sure the above sign-off is verbatim and uses your real name and most accura
 Installing the Plugin 
 =======================
 
-Installing the Crittercism iOS Unity Plugin starts by downloading the latest [iOS][3] Unity.
+Installing the Crittercism iOS Unity Plugin starts by downloading the latest iOS Unity.
 
 The repository includes the following items:
 * **Plugins/iOS** - Contains the static library generated from the Plugin Source (which includes the Crittercism Static Library)
@@ -101,7 +101,7 @@ Can't find your version of Unity? Don't worry, creating a new AppController is p
 5. Follow the below instructions for modifying a Custom AppController
 6. Copy the new "AppController.mm" to "Plugins/iOS" in the Assets directory in your Unity project
 
-**Note:** Help us out and add this new AppController to the Github repo! Create a pull request (described [above][7]) with the AppController.mm renamed with the version number, for example AppController4.2.1.mm under the "AppController" folder. Thanks for your help!
+**Note:** Help us out and add this new AppController to the Github repo! Create a pull request (described above) with the AppController.mm renamed with the version number, for example AppController4.2.1.mm under the "AppController" folder. Thanks for your help!
 
 ### Custom App Controller
  
