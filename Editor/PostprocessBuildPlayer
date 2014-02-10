@@ -1,0 +1,57 @@
+#!/usr/bin/perl 
+   use File::Copy; 
+   
+   my $installPath = $ARGV[0]; 
+   
+   #go through the info.plist file line by line until you find this one: 
+   my $findLine = "CFBundleVersion"; 
+   my $endOfPlist = "</dict>"; 
+      
+   ################################################################ 
+   # This modifies info.plist so you don't have to                # 
+   # set BundleDisplayName manually                               # 
+   ################################################################ 
+   
+   #open this file 
+   
+   $oplistPath = $installPath."/Info.plist"; 
+   $nplistPath = $installPath."/Info.plist.tmp"; 
+   
+   open OLDPLIST, "<", $oplistPath or die("Cannot open Info.plist"); 
+   open NEWPLIST, ">", $nplistPath or die("Cannot create new Info.plist"); 
+   
+   my $newLine = 0;
+       
+   while(<OLDPLIST>) 
+   {
+   	  if($newLine == 1)
+      {
+         $newLine	= $_;
+      }
+      if ($_ =~ m/$findLine/) 
+      {
+         $newLine = 1;
+      }
+       
+      ################################################################ 
+      # Add any key/value pairs you want at the end of Info.plist    # 
+      ################################################################ 
+   
+      if ($_ =~ m/$endOfPlist/) 
+      { 
+         my $keys = ""; 
+         
+         $keys .= "   <key>CFBundleShortVersionString</key>\n"; 
+         $keys .= $newLine;  
+          
+         $_ = $keys . $_; 
+      } 
+       
+      print NEWPLIST $_; 
+   } 
+   
+   close OLDPLIST; 
+   close NEWPLIST; 
+   
+   `mv \'$nplistPath\' \'$oplistPath\'`; 
+   
