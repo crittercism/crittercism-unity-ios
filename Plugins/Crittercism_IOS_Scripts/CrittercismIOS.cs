@@ -45,14 +45,8 @@ public static class CrittercismIOS
 	[DllImport(_INTERNAL)]
 	private static extern string Crittercism_GetUserUUID();
 	
-    [DllImport(_INTERNAL)]
-	private static extern void Crittercism_SetAge(int age);
-    [DllImport(_INTERNAL)]
-	private static extern void Crittercism_SetGender(string gender);
 	[DllImport(_INTERNAL)]
 	private static extern void Crittercism_SetUsername(string key);
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_SetEmail(string email);
 	[DllImport(_INTERNAL)]
 	private static extern void Crittercism_SetValue(string value, string key);
 	
@@ -78,11 +72,8 @@ public static class CrittercismIOS
 	private static void Crittercism_NewException(string name, string reason, string stack) {}
 	
 	private static string Crittercism_GetUserUUID()						{ return ""; }
-	
-    private static void Crittercism_SetAge(int age)									{}
-    private static void Crittercism_SetGender(string gender)						{}
+
 	private static void Crittercism_SetUsername(string key)							{}
-	private static void Crittercism_SetEmail(string email)							{}
 	private static void Crittercism_SetValue(string value, string key)				{}
 	
 	private static void Crittercism_SetOptOutStatus(bool status)					{}
