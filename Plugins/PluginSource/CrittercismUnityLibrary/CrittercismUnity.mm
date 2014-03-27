@@ -179,8 +179,7 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
 
 -(void)performInit:(NSString*)app
 {
-  NSArray *arr    = [[[NSArray alloc]initWithObjects:app,
-                      nil,nil,nil] autorelease];
+  NSArray *arr = [[[NSArray alloc] initWithObjects:app, nil,nil,nil] autorelease];
   
   [self performSelectorOnMainThread:@selector(performInit_Main:) withObject:arr waitUntilDone:TRUE];
 }
@@ -188,27 +187,41 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
 
 -(void)NewLog:(NSString*)logName
 {
-  if (mLogName != NULL)    {   [mLogName release]; }
-  mLogName    = NULL;
+  if (mLogName != NULL) {
+    [mLogName release];
+  }
   
-  if (mLogData != NULL)    {   [mLogData release]; }
-  mLogData    = NULL;
+  mLogName = NULL;
   
-  if (logName == NULL) {   return; }
+  if (mLogData != NULL) {
+    [mLogData release];
+  }
   
-  mLogName    = [[NSString alloc]initWithString:logName];
-  mLogData    = [[NSMutableDictionary alloc]init];
+  mLogData = NULL;
+  
+  if (logName == NULL) {
+    return;
+  }
+  
+  mLogName = [[NSString alloc] initWithString:logName];
+  mLogData = [[NSMutableDictionary alloc] init];
 }
 
--(void)AddLogValue:(NSString*)val key:(NSString*)key
+- (void)AddLogValue:(NSString *)val
+                key:(NSString *)key
 {
-  if (val == NULL || key == NULL || mLogData == NULL)  {   return; }
+  if (!val || !key || !mLogData) {
+    return;
+  }
+
   [mLogData setValue:val forKey:key];
 }
 
 -(void)FinalizeLog
 {
-  if (mLogName == NULL)    {   return; }
+  if (mLogName == NULL) {
+    return;
+  }
   
   //[Crittercism logEvent:mLogName andEventDict:mLogData];
   [mLogName release];
@@ -606,13 +619,16 @@ BOOL _IsInited  = FALSE;
   
   NSString *use_appID = NULL;
   
-  @try
-  {
+  @try {
     NSData* plistData = [appData dataUsingEncoding:NSUTF8StringEncoding];
     NSString *error = NULL;
     NSPropertyListFormat format;
-    NSDictionary* dictionary = [NSPropertyListSerialization propertyListFromData:plistData
-                                                                mutabilityOption:NSPropertyListImmutable format:&format errorDescription:&error];
+    NSDictionary* dictionary =
+      [NSPropertyListSerialization propertyListFromData:plistData
+                                       mutabilityOption:NSPropertyListImmutable
+                                                 format:&format
+                                       errorDescription:&error];
+    
     if (!dictionary) {
       NSLog(@"Crittercism: Plist Error: %@",error);
       throw new NSException();
@@ -620,7 +636,7 @@ BOOL _IsInited  = FALSE;
     
     // Attempt to load the Crittercism file data
     if (dictionary != NULL) {
-      use_appID   = [dictionary objectForKey:@"AppID"];
+      use_appID = [dictionary objectForKey:@"AppID"];
     }
     
     [dictionary release];
@@ -642,11 +658,11 @@ BOOL _IsInited  = FALSE;
   
   //  Init Crittercism
 	if (_ExceptionGenerator == NULL) {
-    _ExceptionGenerator	= [[CrittercismDataGenerator alloc]init];
+    _ExceptionGenerator	= [[CrittercismDataGenerator alloc] init];
   }
   
   //  Call the main thread to preform the init
-	[_ExceptionGenerator performInit:use_appID ];
+	[_ExceptionGenerator performInit:use_appID];
   _IsInited   = TRUE;
   
   [_ExceptionGenerator SendLastException];
@@ -656,7 +672,7 @@ BOOL _IsInited  = FALSE;
   return _IsInited;
 }
 
-+(void) logHandledException:(NSException *)exception
++ (void)logHandledException:(NSException *)exception
 {
   if (_IsInited == false || exception == NULL) {
     return;
