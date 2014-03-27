@@ -275,21 +275,6 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
       [fileManager removeItemAtPath:pathString error:NULL];
     }
     
-#ifdef  USE_C_SAVE
-    FILE* file  = fopen([pathString UTF8String] , "wb+");
-    if (file != NULL)
-    {
-      //  Write out the description, name and stack
-      [self writeString:mExceptionDescription file:file];
-      [self writeString:mExceptionName file:file];
-      [self writeString:mCallStack file:file];
-      
-      //  Close the fie
-      fclose(file);
-      file    = NULL;
-    }
-#else
-    
     NSMutableDictionary *exceptionData  = [[NSMutableDictionary alloc]init];
     
     if (mExceptionDescription != NULL) {
@@ -310,8 +295,7 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
     
     [exceptionData writeToFile:pathString atomically:TRUE];
     [exceptionData release];
-    
-#endif
+
   } catch(NSException* e) {
     DEBUG_LOG(@"CrittercismException: SaveLastException: Error: %@", [e reason]);
   }
@@ -330,16 +314,6 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
     NSString *pathString  = [cachePath stringByAppendingPathComponent:_LAST_FILE_PATH];
     if ([fileManager fileExistsAtPath:pathString]) {
       
-#ifdef  USE_C_SAVE
-      FILE* file  = fopen([pathString UTF8String] , "wb+");
-      if (file != NULL) {
-        mExceptionDescription = [self readString:file];
-        mExceptionName = [self readString:file];
-        mCallStack = [self readString:file];
-        
-        [CrittercismUnity logUnhandledException:[self GetException]];
-      }
-#else
       NSMutableDictionary *exceptionData = [[NSMutableDictionary alloc]initWithContentsOfFile:pathString];
       
       mExceptionDescription = [exceptionData objectForKey:@"Description"];
@@ -368,7 +342,6 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
       [exceptionData release];
       
       [CrittercismUnity logUnhandledException:[self GetException]];
-#endif
     }
   } catch(NSException *e) {
     DEBUG_LOG(@"CrittercismException: SendLastException: Error: %@", [e reason]);
