@@ -162,40 +162,67 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
 
 -(void)NewException
 {
-  if (mException)   {  [mException release];   }
-  mException      = NULL;
-  
-  if (mExceptionName)  {   [mExceptionName release];   }
-  mExceptionName  = NULL;
-  if (mCallStack)  {   [mExceptionName release];   }
-  mCallStack  = NULL;
-  if (mExceptionDescription)   {   [mExceptionDescription release];    }
-  mExceptionDescription   = NULL;
-  if (mExceptionDetails)   {   [mExceptionDetails release];    }
+  if (mException) {
+    [mException release];
+  }
+
+  mException = NULL;
+
+  if (mExceptionName) {
+    [mExceptionName release];
+  }
+
+  mExceptionName = NULL;
+  if (mCallStack) {
+    [mExceptionName release];
+  }
+
+  mCallStack = NULL;
+  if (mExceptionDescription) {
+    [mExceptionDescription release];
+  }
+
+  mExceptionDescription  = NULL;
+  if (mExceptionDetails) {
+    [mExceptionDetails release];
+  }
+
   mExceptionDetails   = NULL;
 }
 
 -(void)SetExceptionName:(NSString*)name
 {
-  if (mExceptionName)   {   [mExceptionName release];    }
-  mExceptionName   = [[NSString alloc] initWithString:[name stringByDecodingURLFormat]];
+  if (mExceptionName) {
+    [mExceptionName release];
+  }
+  
+  mExceptionName = [[NSString alloc] initWithString:[name stringByDecodingURLFormat]];
 }
 
 -(void)SetExceptionStack:(NSString*)stack
 {
-  if (mCallStack)   {   [mCallStack release];    }
-  mCallStack   = [[NSString alloc] initWithString:[stack stringByDecodingURLFormat]];
+  if (mCallStack) {
+    [mCallStack release];
+  }
+  
+  mCallStack  = [[NSString alloc] initWithString:[stack stringByDecodingURLFormat]];
 }
 
 -(void)SetExceptionDescription:(NSString*)desc
 {
-  if (mExceptionDescription)   {   [mExceptionDescription release];    }
-  mExceptionDescription   = [[NSString alloc] initWithString:[desc stringByDecodingURLFormat]];
+  if (mExceptionDescription) {
+    [mExceptionDescription release];
+  }
+  
+  mExceptionDescription = [[NSString alloc] initWithString:[desc stringByDecodingURLFormat]];
 }
 
 -(void)AddExceptionInformation:(NSString*)information key:(NSString*)key
 {
-  if (mExceptionDetails == NULL)   {   mExceptionDetails   = [[NSMutableDictionary alloc]init];    }
+  if (mExceptionDetails == NULL) {
+    mExceptionDetails = [[NSMutableDictionary alloc]init];
+  }
+  
   [mExceptionDetails setObject:[information stringByDecodingURLFormat] forKey:key];
 }
 
