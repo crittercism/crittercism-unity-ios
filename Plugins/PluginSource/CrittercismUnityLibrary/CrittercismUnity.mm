@@ -7,15 +7,11 @@
 //
 #import <fstream>
 
-#define VERSION_3
-//#define VERSION_2
-//#define DEBUG_LOGS
-#define CUSTOM_EXCEPTION
 #import "Crittercism.h"
 #import "CrittercismUnity.h"
 #import "CrittercismExtern.h"
 
-#ifdef DEBUG_LOGS
+#ifdef DEBUG
 #define DEBUG_LOG(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 #else
 #define DEBUG_LOG(...)
@@ -36,7 +32,6 @@ void signal_handler(int idn);   //  Prototype, just to kill the warning
 @end
 
 
-#ifdef CUSTOM_EXCEPTION
 @interface CrittercismException : NSException {
   NSString* mCallStack;
 }
@@ -94,10 +89,6 @@ void signal_handler(int idn);   //  Prototype, just to kill the warning
 }
 
 @end
-
-#endif
-
-
 
 @interface PerformExceptionHandler : NSObject
 
@@ -208,7 +199,7 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
   mCallStack  = [[NSString alloc] initWithString:[stack stringByDecodingURLFormat]];
 }
 
--(void)SetExceptionDescription:(NSString*)desc
+- (void)SetExceptionDescription:(NSString *)desc
 {
   if (mExceptionDescription) {
     [mExceptionDescription release];
@@ -217,7 +208,7 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
   mExceptionDescription = [[NSString alloc] initWithString:[desc stringByDecodingURLFormat]];
 }
 
--(void)AddExceptionInformation:(NSString*)information key:(NSString*)key
+- (void)AddExceptionInformation:(NSString *)information key:(NSString *)key
 {
   if (mExceptionDetails == NULL) {
     mExceptionDetails = [[NSMutableDictionary alloc]init];
@@ -230,17 +221,12 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
 {
   if (mException == NULL)
   {
-#ifdef CUSTOM_EXCEPTION
     mException  = [[CrittercismException alloc]initWithName:mExceptionName
                                                      reason:mExceptionDescription
                                                    userInfo: nil
                                                   callstack:mCallStack];
-#else
-    mException  = [[NSException alloc]initWithName:mExceptionName
-                                            reason:[NSString stringWithFormat:@"%@\n%@", mExceptionDescription, mCallStack]
-                                          userInfo:mExceptionDetails];
-#endif
   }
+
   return mException;
 }
 
@@ -775,26 +761,12 @@ BOOL _IsInited  = FALSE;
     return;
   }
   
-	DEBUG_LOG(@"Crittercism: logUnhandledException: logging");
-  
   [PerformExceptionHandler PerformException:exception];
-  
-	DEBUG_LOG(@"Crittercism: logUnhandledException: logged");
 }
 
 +(void)_callLogHandleException:(NSException*)exception
 {
-#ifdef VERSION_3
-
-	DEBUG_LOG(@"Crittercism: _callLogHandleException: logging");
-  
   [Crittercism logHandledException:exception];
-
-  DEBUG_LOG(@"Crittercism: _callLogHandleException: logged");
-  
-#elif defined(VERSION_2)
-  [Crittercism logEvent:[exception name] andEventDict:[[NSMutableDictionary alloc]init]];
-#endif
 }
 
 @end
