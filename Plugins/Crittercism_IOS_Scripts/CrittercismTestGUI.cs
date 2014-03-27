@@ -38,20 +38,11 @@ public class CrittercismTestGUI : MonoBehaviour
 			Debug.Log("BreadcrumbTest");
 			CrittercismIOS.LeaveBreadcrumb("BreadCrumb");
 			
-			Debug.Log("AgeTest");
-			CrittercismIOS.SetAge(26);
-			
-			Debug.Log("EMailTest");
-			CrittercismIOS.SetEmail("email@test.com");
-			
 			Debug.Log("UserTest");
 			CrittercismIOS.SetUsername("Username");
 			
 			Debug.Log("ValueTest");
 			CrittercismIOS.SetValue("A Value", "A Key");
-			
-			Debug.Log("EventTest");
-//			CrittercismIOS.LogEvent("EventTest", null);
 		}
 	}
 	

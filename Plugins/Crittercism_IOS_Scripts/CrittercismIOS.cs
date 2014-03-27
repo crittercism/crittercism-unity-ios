@@ -55,9 +55,6 @@ public static class CrittercismIOS
 	[DllImport(_INTERNAL)]
 	private static extern bool Crittercism_GetOptOutStatus();
 	
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_RefreshSignalRegister();
-	
 #else
 	private static bool Crittercism_IsInited() { return false; }
 	private static void Crittercism_EnableWithAppID(string appID)	{}
@@ -78,8 +75,6 @@ public static class CrittercismIOS
 	
 	private static void Crittercism_SetOptOutStatus(bool status)					{}
 	private static bool Crittercism_GetOptOutStatus()				 { return false; }
-	
-	private static void Crittercism_RefreshSignalRegister()							{}
     
 #endif
 	
@@ -145,11 +140,6 @@ public static class CrittercismIOS
 	public static void Init(string appID, bool loadFromResources, bool handleUnityExceptions)
 	{
 		_IsPluginInited	= Crittercism_IsInited();
-		if(_IsUnityPluginInited && _IsPluginInited)
-		{
-			Crittercism_RefreshSignalRegister();
-			return;
-		}
 		
 		_HandleUnityExceptions	= handleUnityExceptions;
 		
@@ -269,25 +259,6 @@ public static class CrittercismIOS
 	/// Leave a breadcrumb for tracking.
 	/// </summary>
 	static public void LeaveBreadcrumb(string l)	{	Crittercism_LeaveBreadcrumb(_EscapeString(l));	}
-	
-	/// <summary>
-	/// Log an event with Crittercism to be sent to the Web Portal.
-	/// </summary>
-	static public void LogEvent(string eventName, System.Collections.Generic.Dictionary<string, string> vals)
-	{
-//		Crittercism_NewLog(eventName);
-		
-		if(vals != null)
-		{
-			//TODO: Check whether SetValue == SetLogValue
-			foreach(System.Collections.Generic.KeyValuePair<string,string> entry in vals)
-			{	Crittercism_SetValue(_EscapeString(entry.Key), _EscapeString(entry.Value));	}
-		}
-		
-//		Crittercism_FinishLog();
-	}
-	
-	
 	
 	static private string _EscapeString(string enter)
 	{
