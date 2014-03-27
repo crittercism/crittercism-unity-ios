@@ -264,29 +264,11 @@ public static class CrittercismIOS
 	static public void SetOptOut(bool s)	{	Crittercism_SetOptOutStatus(s);	}
 	
 	/// <summary>
-	/// Set the age of the user.
-	/// This will be reported in the Crittercism Meta.
-	/// </summary>
-	static public void SetAge(int age)	{	Crittercism_SetAge(age);	}
-	
-	/// <summary>
-	/// Set the Gender of the user
-	/// This will be reported in the Crittercism Meta.
-	/// </summary>
-    static public void SetGender(string gender)	{	Crittercism_SetGender(_EscapeString(gender));	}
-	
-	/// <summary>
 	/// Set the Username of the user
 	/// This will be reported in the Crittercism Meta.
 	/// </summary>
     static public void SetUsername(string username)	{	Crittercism_SetUsername(_EscapeString(username));	}
-	
-	/// <summary>
-	/// Set the Email of the user
-	/// This will be reported in the Crittercism Meta.
-	/// </summary>
-    static public void SetEmail(string email)	{	Crittercism_SetEmail(_EscapeString(email));	}
-	
+
 	/// <summary>
 	/// Add a custom value to the Crittercism Meta.
 	/// </summary>
