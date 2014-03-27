@@ -151,11 +151,7 @@ void signal_handler(int idn);   //  Prototype, just to kill the warning
 
 @end
 
-
-
 static CrittercismDataGenerator* _ExceptionGenerator  = NULL;
-
-
 
 @implementation CrittercismDataGenerator
 
@@ -421,10 +417,6 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
 
 @end
 
-<<<<<<< HEAD
-
-=======
->>>>>>> clean-up
 void Crittercism_EnableWithAppID(const char* appID)
 {
     NSString *str_appID     = NULL;
@@ -502,16 +494,15 @@ void Crittercism_NewException(const char* name, const char* reason, const char *
 
 void Crittercism_LeaveBreadcrumb(const char* breadcrumb)
 {
-<<<<<<< HEAD
     if(breadcrumb == NULL || ![CrittercismUnity isInited])  {   return; }
     
     @try {
-        NSString *str   = [NSString stringWithCString:breadcrumb encoding:NSUTF8StringEncoding];
-        str   = [str stringByDecodingURLFormat];
-        [Crittercism  leaveBreadcrumb:str];
+        NSString *crumb   = [NSString stringWithCString:breadcrumb encoding:NSUTF8StringEncoding];
+        crumb   = [crumb stringByDecodingURLFormat];
+        [Crittercism  leaveBreadcrumb:crumb];
     } @catch (NSException *e)
     {
-        
+        // do nothing
     }
 }
 
@@ -527,30 +518,21 @@ void Crittercism_SetAsyncBreadcrumbMode(bool writeAsync)
     }
 }
 
+// Don't currently support this for C# scripts in Unity
 const char* Crittercism_GetUserUUID()
 {
-    return (const char *)[Crittercism getUserUUID];
-}
-
-=======
     //return (char*)[Crittercism getUserUUID];
     return "";
 }
 
->>>>>>> clean-up
 void Crittercism_SetUsername(const char* username)
 {
-    if(![CrittercismUnity isInited] || username == NULL)    {   return; }
-    
-<<<<<<< HEAD
-    NSString *str   = [NSString stringWithUTF8String:username];
-    str = [str stringByDecodingURLFormat];
-    [Crittercism setUsername:str];
-=======
+    if(![CrittercismUnity isInited] || username == NULL)
+    {   return; }
+
     NSString *usr   = [NSString stringWithUTF8String:username];
     usr = [usr stringByDecodingURLFormat];
     [Crittercism setUsername:usr];
->>>>>>> clean-up
 }
 
 void Crittercism_SetValue(const char* value, const char* key)
@@ -558,15 +540,6 @@ void Crittercism_SetValue(const char* value, const char* key)
     if(![CrittercismUnity isInited] || value == NULL || key == NULL 
        || _ExceptionGenerator == NULL)    {   return; }
     
-<<<<<<< HEAD
-    NSString *val   = [NSString stringWithUTF8String:value];
-    val = [val stringByDecodingURLFormat];
-    
-    NSString *theKey   = [NSString stringWithUTF8String:key];
-    theKey = [theKey stringByDecodingURLFormat];
-    
-    [Crittercism setValue:val forKey:theKey];
-=======
     NSString *t_val   = [NSString stringWithUTF8String:value];
     t_val = [t_val stringByDecodingURLFormat];
     
@@ -574,7 +547,6 @@ void Crittercism_SetValue(const char* value, const char* key)
     t_key = [t_key stringByDecodingURLFormat];
     
     [Crittercism setValue:t_val forKey:t_key];
->>>>>>> clean-up
 }
 
 void Crittercism_NewLog(const char* name)
@@ -626,38 +598,6 @@ BOOL _IsInited  = FALSE;
 
 +(void)initWithAppID:(NSString*)appID
 {
-<<<<<<< HEAD
-    /*printf("registerLocalSignalHandlers\n");
-    
-    signal(SIGABRT, signal_handler);
-    signal(SIGILL, signal_handler);
-    signal(SIGSEGV, signal_handler);
-    signal(SIGFPE, signal_handler);
-    signal(SIGBUS, signal_handler);
-    signal(SIGPIPE, signal_handler);
-    signal(SIGKILL, signal_handler);
-    signal(SIGSYS, signal_handler);
-    signal(SIGQUIT, signal_handler);
-    signal(SIGTRAP, signal_handler);*/
-    
-    /*signal(SIGABRT, SIG_DFL);
-	signal(SIGILL, SIG_DFL);
-	signal(SIGSEGV, SIG_DFL);
-	signal(SIGFPE, SIG_DFL);
-	signal(SIGBUS, SIG_DFL);
-	signal(SIGPIPE, SIG_DFL);*/
-}
-
-+(void)initWithAppID:(NSString*)appID
-{
-    if(_IsInited)
-    {
-        [self registerLocalSignalHandlers];
-        return;
-    }
-=======
->>>>>>> clean-up
-    
     NSString *use_appID     = appID;
     
     @try
@@ -678,13 +618,7 @@ BOOL _IsInited  = FALSE;
             [dictionary release];
             
             //  Handle the init
-<<<<<<< HEAD
             if(use_appID == NULL || [use_appID isEqual: @""])
-=======
-            if(use_appID == NULL || [use_appID  isEqual: @""]
-
-               )
->>>>>>> clean-up
             {
                 use_appID   = appID;
             }
@@ -700,22 +634,15 @@ BOOL _IsInited  = FALSE;
 #endif
 	
     //  Last check for null keys
-<<<<<<< HEAD
     if(use_appID == NULL)
-    {   return; }
-=======
-    if(use_appID == NULL) { return; }
->>>>>>> clean-up
+    { return; }
     
     //  Init Crittercism
 	if(_ExceptionGenerator == NULL)	{	_ExceptionGenerator	= [[CrittercismDataGenerator alloc]init];	}
     
     //  Call the main thread to preform the init
 	[_ExceptionGenerator performInit:use_appID ];
-<<<<<<< HEAD
-=======
-    
->>>>>>> clean-up
+
     _IsInited   = TRUE;
     
     [_ExceptionGenerator SendLastException];
@@ -723,7 +650,8 @@ BOOL _IsInited  = FALSE;
 
 +(void)initWithFileData:(NSString*)appData
 {
-    if(_IsInited || appData == NULL)   {   return; }
+    if(_IsInited || appData == NULL)
+    {   return; }
     
     NSString *use_appID     = NULL;
     
@@ -747,12 +675,7 @@ BOOL _IsInited  = FALSE;
         [dictionary release];
         
         //  Handle the init
-<<<<<<< HEAD
         if(use_appID == NULL || [use_appID isEqual: @""])
-=======
-        if(use_appID == NULL || [use_appID  isEqual: @""]
-           )
->>>>>>> clean-up
         {
             use_appID   = NULL;
         }
@@ -765,12 +688,7 @@ BOOL _IsInited  = FALSE;
 #endif
 	
     //  Last check for null keys
-<<<<<<< HEAD
     if(use_appID == NULL)
-=======
-    if(use_appID == NULL
-       )
->>>>>>> clean-up
     {   return; }
     
     //  Init Crittercism
@@ -788,8 +706,9 @@ BOOL _IsInited  = FALSE;
 
 
 +(void)logHandledException:(NSException*)exception
-{	
-    if(_IsInited == false || exception == NULL)   {   return; }
+{
+    if(_IsInited == false || exception == NULL)
+    {   return; }
     
     #ifdef DEBUG_LOGS
 	NSLog(@"Crittercism: logHandledException: logging");
@@ -805,7 +724,8 @@ BOOL _IsInited  = FALSE;
 
 +(void)logUnhandledException:(NSException *)exception
 {
-	if(_IsInited == false || exception == NULL || _ExceptionGenerator == NULL)   {   return; }
+	if(_IsInited == false || exception == NULL || _ExceptionGenerator == NULL)
+    {   return; }
     
     #ifdef DEBUG_LOGS
 	NSLog(@"Crittercism: logUnhandledException: logging");
