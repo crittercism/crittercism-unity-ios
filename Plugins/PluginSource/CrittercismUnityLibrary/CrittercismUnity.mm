@@ -10,6 +10,7 @@
 #import "Crittercism.h"
 #import "CrittercismUnity.h"
 #import "CrittercismExtern.h"
+#import "CrittercismException.h"
 
 #ifdef DEBUG
 #define DEBUG_LOG(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
@@ -29,65 +30,6 @@ void signal_handler(int idn);   //  Prototype, just to kill the warning
   NSString *result = [(NSString *)self stringByReplacingOccurrencesOfString:@"+" withString:@" "];
   return [result stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 }
-@end
-
-
-@interface CrittercismException : NSException {
-  NSString* mCallStack;
-}
-
--(NSException*)initWithName:(NSString *)name reason:(NSString *)reason userInfo:(NSDictionary *)userInfo callstack:(NSString*)stack;
-
-- (NSArray *)callStackReturnAddresses;
-- (NSArray *)callStackSymbols;
-
-@end
-
-
-
-@implementation CrittercismException
-
--(NSException*)initWithName:(NSString *)name reason:(NSString *)reason userInfo:(NSDictionary *)userInfo callstack:(NSString*)stack
-{
-  DEBUG_LOG(@"CrittercismException: ctor(), %@, %@, %@", name, reason, stack);
-
-  if (self = [super initWithName:name reason:reason userInfo:userInfo])
-  {   mCallStack  = stack;    }
-  
-  DEBUG_LOG(@"CrittercismException: ctor() done");
-  return self;
-}
-
-- (NSArray *)callStackReturnAddresses
-{
-  DEBUG_LOG(@"CrittercismException: callStackReturnAddresses");
-
-  NSArray *arr    = NULL;
-  if (arr == NULL || [arr count] == 0) {
-    arr = [super callStackReturnAddresses];
-  }
-  
-  return arr;
-}
-
-- (NSArray *)callStackSymbols
-{
-  DEBUG_LOG(@"CrittercismException: callStackReturnAddresses");
-  
-  NSArray *arr = NULL;
-
-  if (mCallStack != NULL) {
-    NSLog(@"Callstack: %@",mCallStack);
-    arr = [mCallStack componentsSeparatedByString:@"\n"];
-  }
-  
-  if (arr == NULL || [arr count] == 0) {
-    arr = [super callStackSymbols];
-  }
-
-  return arr;
-}
-
 @end
 
 @interface PerformExceptionHandler : NSObject
