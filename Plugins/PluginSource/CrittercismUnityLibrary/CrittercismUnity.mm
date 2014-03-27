@@ -15,6 +15,11 @@
 #import "CrittercismUnity.h"
 #import "CrittercismExtern.h"
 
+#ifdef DEBUG_LOGS
+#define DEBUG_LOG(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+#else
+#define DEBUG_LOG(...)
+#endif
 
 void signal_handler(int idn);   //  Prototype, just to kill the warning
 
@@ -49,23 +54,19 @@ void signal_handler(int idn);   //  Prototype, just to kill the warning
 
 -(NSException*)initWithName:(NSString *)name reason:(NSString *)reason userInfo:(NSDictionary *)userInfo callstack:(NSString*)stack
 {
-#ifdef  DEBUG_LOGS
-  NSLog(@"CrittercismException: ctor(), %@, %@, %@", name, reason, stack);
-#endif
+  DEBUG_LOG(@"CrittercismException: ctor(), %@, %@, %@", name, reason, stack);
+
   if(self = [super initWithName:name reason:reason userInfo:userInfo])
   {   mCallStack  = stack;    }
   
-#ifdef  DEBUG_LOGS
-  NSLog(@"CrittercismException: ctor() done");
-#endif
+  DEBUG_LOG(@"CrittercismException: ctor() done");
   return self;
 }
 
 - (NSArray *)callStackReturnAddresses
 {
-#ifdef  DEBUG_LOGS
-  NSLog(@"CrittercismException: callStackReturnAddresses");
-#endif
+  DEBUG_LOG(@"CrittercismException: callStackReturnAddresses");
+
   NSArray *arr    = NULL;
   if(arr == NULL || [arr count] == 0) {   arr = [super callStackReturnAddresses];   }
   
@@ -74,9 +75,7 @@ void signal_handler(int idn);   //  Prototype, just to kill the warning
 
 - (NSArray *)callStackSymbols
 {
-#ifdef  DEBUG_LOGS
-  NSLog(@"CrittercismException: callStackReturnAddresses");
-#endif
+  DEBUG_LOG(@"CrittercismException: callStackReturnAddresses");
   
   NSArray *arr    = NULL;
   if(mCallStack != NULL)
@@ -352,9 +351,7 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
     
   }catch(NSException* e)
   {
-#ifdef  DEBUG_LOGS
-    NSLog(@"CrittercismException: SaveLastException: Error: %@", [e reason]);
-#endif
+    DEBUG_LOG(@"CrittercismException: SaveLastException: Error: %@", [e reason]);
   }
 }
 
@@ -409,9 +406,7 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
   }
   catch(NSException *e)
   {
-#ifdef  DEBUG_LOGS
-    NSLog(@"CrittercismException: SendLastException: Error: %@", [e reason]);
-#endif
+    DEBUG_LOG(@"CrittercismException: SendLastException: Error: %@", [e reason]);
   }
 }
 
@@ -428,9 +423,7 @@ bool Crittercism_IsInited()	{	return [CrittercismUnity isInited];	}
 
 void Crittercism_LogUnhandledExceptionWillCrash()
 {
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism_LogUnhandledExceptionWillCrash");
-#endif
+	DEBUG_LOG(@"Crittercism_LogUnhandledExceptionWillCrash");
   
   if(_ExceptionGenerator == NULL) {   return; }
   
@@ -442,9 +435,7 @@ void Crittercism_LogUnhandledExceptionWillCrash()
 
 void Crittercism_LogHandledException()
 {
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism_LogHandledException");
-#endif
+	DEBUG_LOG(@"Crittercism_LogHandledException");
 	
   if(_ExceptionGenerator == NULL) {   return; }
   
@@ -456,9 +447,7 @@ void Crittercism_LogHandledException()
 
 void Crittercism_LogUnhandledException()
 {
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism_LogUnhandledException");
-#endif
+	DEBUG_LOG(@"Crittercism_LogUnhandledException");
 	
 	if(_ExceptionGenerator == NULL) {   return; }
   
@@ -470,9 +459,7 @@ void Crittercism_LogUnhandledException()
 
 void Crittercism_NewException(const char* name, const char* reason, const char *stack)
 {
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism_NewException");
-#endif
+	DEBUG_LOG(@"Crittercism_NewException");
 	
   if(_ExceptionGenerator == NULL) {   _ExceptionGenerator = [[CrittercismDataGenerator alloc]init];  }
   
@@ -607,9 +594,8 @@ BOOL _IsInited  = FALSE;
     if(file_name != NULL)
     {
       
-#ifdef DEBUG_LOGS
-      NSLog(@"Crittercism: AppID File Found: %@", file_name);
-#endif
+      DEBUG_LOG(@"Crittercism: AppID File Found: %@", file_name);
+
       NSDictionary *dictionary    = [[NSDictionary alloc]initWithContentsOfFile:file_name];
       if(dictionary != NULL)
       {
@@ -629,9 +615,7 @@ BOOL _IsInited  = FALSE;
     use_appID   = appID;
   }
   
-#ifdef DEBUG_LOGS
-  NSLog(@"Crittercism: AppID:%@", use_appID);
-#endif
+  DEBUG_LOG(@"Crittercism: AppID:%@", use_appID);
 	
   //  Last check for null keys
   if(use_appID == NULL)
@@ -683,9 +667,7 @@ BOOL _IsInited  = FALSE;
   @catch(NSException *e)
   {  return; }
   
-#ifdef DEBUG_LOGS
-  NSLog(@"Crittercism: AppID:%@", use_appID);
-#endif
+  DEBUG_LOG(@"Crittercism: AppID:%@", use_appID);
 	
   //  Last check for null keys
   if(use_appID == NULL)
@@ -710,15 +692,11 @@ BOOL _IsInited  = FALSE;
   if(_IsInited == false || exception == NULL)
   {   return; }
   
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism: logHandledException: logging");
-#endif
+	DEBUG_LOG(@"Crittercism: logHandledException: logging");
 	
   [PerformExceptionHandler PerformException:exception];
   
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism: logHandledException: logged");
-#endif
+	DEBUG_LOG(@"Crittercism: logHandledException: logged");
 }
 
 
@@ -727,30 +705,25 @@ BOOL _IsInited  = FALSE;
 	if(_IsInited == false || exception == NULL || _ExceptionGenerator == NULL)
   {   return; }
   
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism: logUnhandledException: logging");
-#endif
+	DEBUG_LOG(@"Crittercism: logUnhandledException: logging");
   
   [PerformExceptionHandler PerformException:exception];
   
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism: logUnhandledException: logged");
-#endif
+	DEBUG_LOG(@"Crittercism: logUnhandledException: logged");
+
 }
 
 +(void)_callLogHandleException:(NSException*)exception
 {
 #ifdef VERSION_3
-  
-#ifdef DEBUG_LOGS
-	NSLog(@"Crittercism: _callLogHandleException: logging");
-#endif
+
+	DEBUG_LOG(@"Crittercism: _callLogHandleException: logging");
+
   
   [Crittercism logHandledException:exception];
   
-#ifdef DEBUG_LOGS
-  NSLog(@"Crittercism: _callLogHandleException: logged");
-#endif
+
+  DEBUG_LOG(@"Crittercism: _callLogHandleException: logged");
   
 #elif defined(VERSION_2)
   [Crittercism logEvent:[exception name] andEventDict:[[NSMutableDictionary alloc]init]];
