@@ -63,9 +63,6 @@ void signal_handler(int idn);   //  Prototype, just to kill the warning
   NSString *mExceptionDescription;
   NSString *mCallStack;
   NSMutableDictionary *mExceptionDetails;
-  
-  NSString *mLogName;
-  NSMutableDictionary *mLogData;
 }
 
 - (void)NewException;
@@ -75,12 +72,7 @@ void signal_handler(int idn);   //  Prototype, just to kill the warning
 - (void)SetExceptionDescription:(NSString*)desc;
 - (void)AddExceptionInformation:(NSString*)information key:(NSString*)key;
 
-
 - (void)performInit:(NSString*)app;
-
-- (void)NewLog:(NSString*)logName;
-- (void)AddLogValue:(NSString*)val key:(NSString*)key;
-- (void)FinalizeLog;
 
 - (void)SaveLastException;
 - (void)SendLastException;
@@ -183,53 +175,6 @@ NSString *_LAST_FILE_PATH  = @"CrittercismLastException.plist";
   
   [self performSelectorOnMainThread:@selector(performInit_Main:) withObject:arr waitUntilDone:TRUE];
 }
-
-
--(void)NewLog:(NSString*)logName
-{
-  if (mLogName != NULL) {
-    [mLogName release];
-  }
-  
-  mLogName = NULL;
-  
-  if (mLogData != NULL) {
-    [mLogData release];
-  }
-  
-  mLogData = NULL;
-  
-  if (logName == NULL) {
-    return;
-  }
-  
-  mLogName = [[NSString alloc] initWithString:logName];
-  mLogData = [[NSMutableDictionary alloc] init];
-}
-
-- (void)AddLogValue:(NSString *)val
-                key:(NSString *)key
-{
-  if (!val || !key || !mLogData) {
-    return;
-  }
-
-  [mLogData setValue:val forKey:key];
-}
-
--(void)FinalizeLog
-{
-  if (mLogName == NULL) {
-    return;
-  }
-  
-  //[Crittercism logEvent:mLogName andEventDict:mLogData];
-  [mLogName release];
-  mLogName    = NULL;
-  [mLogData release];
-  mLogData    = NULL;
-}
-
 
 -(void)writeString:(NSString*)str file:(FILE*)file
 {
@@ -504,42 +449,6 @@ void Crittercism_SetValue(const char* value, const char* key)
   t_key = [t_key stringByDecodingURLFormat];
   
   [Crittercism setValue:t_val forKey:t_key];
-}
-
-void Crittercism_NewLog(const char* name)
-{
-  if (![CrittercismUnity isInited] || name == NULL || _ExceptionGenerator == NULL) {
-    return;
-  }
-  
-  NSString *str   = [NSString stringWithUTF8String:name];
-  str = [str stringByDecodingURLFormat];
-  
-  [_ExceptionGenerator NewLog:str];
-}
-
-void Crittercism_SetLogValue(const char *key, const char *value)
-{
-  if (![CrittercismUnity isInited] || value == NULL || key == NULL || _ExceptionGenerator == NULL) {
-    return;
-  }
-  
-  NSString *str   = [NSString stringWithUTF8String:value];
-  str = [str stringByDecodingURLFormat];
-  
-  NSString *str1   = [NSString stringWithUTF8String:key];
-  str1 = [str stringByDecodingURLFormat];
-  
-  [_ExceptionGenerator AddLogValue:str key:str1];
-}
-
-void Crittercism_FinishLog()
-{
-  if (![CrittercismUnity isInited] || _ExceptionGenerator == NULL) {
-    return;
-  }
-
-  [_ExceptionGenerator FinalizeLog];
 }
 
 bool Crittercism_GetOptOutStatus()

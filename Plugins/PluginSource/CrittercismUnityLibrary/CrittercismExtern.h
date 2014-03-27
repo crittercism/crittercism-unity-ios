@@ -33,10 +33,6 @@ extern "C" {
 	void Crittercism_SetOptOutStatus(bool status);
   bool Crittercism_GetOptOutStatus();
   
-  void Crittercism_NewLog(const char* name);
-  void Crittercism_SetLogValue(const char *key, const char *value);
-  void Crittercism_FinishLog();
-  
   void Crittercism_RefreshSignalRegister();
   
 #ifdef __cplusplus
