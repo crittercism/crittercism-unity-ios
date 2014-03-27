@@ -2,8 +2,8 @@
 //  CrittercismException.h
 //  CrittercismUnityLibrary
 //
-//  Created by David Shirley 2 on 3/26/14.
-//
+//  Created by David Shirley on 3/26/14.
+//  Copyright (c) 2014 Crittercism. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

@@ -2,8 +2,8 @@
 //  CrittercismUnity.mm
 //  CrittercismUnity
 //
-//  Created by Ben Bethel on 3/13/12.
-//  Copyright (c) 2012 Flying Wisdom Studios. All rights reserved.
+//  Edited by Eddie Freeman
+//  Copyright (c) 2014 Crittercism. All rights reserved.
 //
 #import <fstream>
 

@@ -6,7 +6,7 @@
 #     into your project in XCode)
 #   * In the project editor, select your target.
 #   * Click "Build Phases" at the top of the project editor.
-#   * Click "Add Buid Phase" in the lower right corner.
+#   * Click "Add Build Phase" in the lower right corner.
 #   * Choose "Add Run Script."
 #   * Paste the following script into the dark text box. You will have to 
 #     uncomment the lines (remove the #s) of course.

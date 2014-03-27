@@ -7,20 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		168963051511C17D00C4A49B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168963041511C17D00C4A49B /* UIKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		1698E23C150FF96000341879 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1698E23B150FF96000341879 /* Foundation.framework */; };
 		1698E242150FF96100341879 /* CrittercismUnityLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1698E241150FF96100341879 /* CrittercismUnityLibrary.m */; };
 		1698E252150FF9F400341879 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1698E251150FF9F400341879 /* SystemConfiguration.framework */; };
 		1698E294150FFA0900341879 /* CrittercismExtern.h in Headers */ = {isa = PBXBuildFile; fileRef = 1698E273150FFA0900341879 /* CrittercismExtern.h */; };
 		1698E295150FFA0900341879 /* CrittercismUnity.h in Headers */ = {isa = PBXBuildFile; fileRef = 1698E274150FFA0900341879 /* CrittercismUnity.h */; };
 		1698E296150FFA0900341879 /* CrittercismUnity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1698E275150FFA0900341879 /* CrittercismUnity.mm */; };
+		2C8355AE18E4C23E00319926 /* CRFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8355A918E4C23E00319926 /* CRFilter.h */; };
+		2C8355AF18E4C23E00319926 /* Crittercism.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8355AA18E4C23E00319926 /* Crittercism.h */; };
+		2C8355B018E4C23E00319926 /* CrittercismDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8355AB18E4C23E00319926 /* CrittercismDelegate.h */; };
+		2C8355B118E4C23E00319926 /* libCrittercism_v4_3_2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8355AD18E4C23E00319926 /* libCrittercism_v4_3_2.a */; };
 		2CED489F16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 2CED489E16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch */; };
 		9F459E7618E3C7100049C5EF /* CrittercismException.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F459E7418E3C7100049C5EF /* CrittercismException.h */; };
 		9F459E7718E3C7100049C5EF /* CrittercismException.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F459E7518E3C7100049C5EF /* CrittercismException.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		168963041511C17D00C4A49B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1698E238150FF96000341879 /* libCrittercismUnity.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCrittercismUnity.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1698E23B150FF96000341879 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1698E240150FF96100341879 /* CrittercismUnityLibrary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CrittercismUnityLibrary.h; sourceTree = "<group>"; };
@@ -29,11 +31,11 @@
 		1698E273150FFA0900341879 /* CrittercismExtern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrittercismExtern.h; sourceTree = "<group>"; };
 		1698E274150FFA0900341879 /* CrittercismUnity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrittercismUnity.h; sourceTree = "<group>"; };
 		1698E275150FFA0900341879 /* CrittercismUnity.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CrittercismUnity.mm; sourceTree = "<group>"; };
-		2CC157C4181F4C3D00A5CE4E /* CRFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CRFilter.h; sourceTree = "<group>"; };
-		2CC157C5181F4C3D00A5CE4E /* Crittercism.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Crittercism.h; sourceTree = "<group>"; };
-		2CC157C6181F4C3D00A5CE4E /* CrittercismDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CrittercismDelegate.h; sourceTree = "<group>"; };
-		2CC157C7181F4C3D00A5CE4E /* dsym_upload.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = dsym_upload.sh; sourceTree = "<group>"; };
-		2CC157C8181F4C3D00A5CE4E /* libCrittercism_v4_1_1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCrittercism_v4_1_1.a; sourceTree = "<group>"; };
+		2C8355A918E4C23E00319926 /* CRFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CRFilter.h; sourceTree = "<group>"; };
+		2C8355AA18E4C23E00319926 /* Crittercism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crittercism.h; sourceTree = "<group>"; };
+		2C8355AB18E4C23E00319926 /* CrittercismDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrittercismDelegate.h; sourceTree = "<group>"; };
+		2C8355AC18E4C23E00319926 /* dsym_upload.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = dsym_upload.sh; sourceTree = "<group>"; };
+		2C8355AD18E4C23E00319926 /* libCrittercism_v4_3_2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCrittercism_v4_3_2.a; sourceTree = "<group>"; };
 		2CED489E16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CrittercismUnityLibrary-Prefix.pch"; sourceTree = "<group>"; };
 		9F459E7418E3C7100049C5EF /* CrittercismException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrittercismException.h; sourceTree = "<group>"; };
 		9F459E7518E3C7100049C5EF /* CrittercismException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrittercismException.m; sourceTree = "<group>"; };
@@ -46,7 +48,7 @@
 			files = (
 				1698E23C150FF96000341879 /* Foundation.framework in Frameworks */,
 				1698E252150FF9F400341879 /* SystemConfiguration.framework in Frameworks */,
-				168963051511C17D00C4A49B /* UIKit.framework in Frameworks */,
+				2C8355B118E4C23E00319926 /* libCrittercism_v4_3_2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,7 +58,7 @@
 		1698E22D150FF96000341879 = {
 			isa = PBXGroup;
 			children = (
-				2CC157C3181F4C3D00A5CE4E /* CrittercismSDK */,
+				2C8355A818E4C23E00319926 /* CrittercismSDK */,
 				1698E23D150FF96000341879 /* CrittercismUnityLibrary */,
 				1698E23A150FF96000341879 /* Frameworks */,
 			);
@@ -76,7 +78,6 @@
 				1698E239150FF96000341879 /* Products */,
 				1698E251150FF9F400341879 /* SystemConfiguration.framework */,
 				1698E23B150FF96000341879 /* Foundation.framework */,
-				168963041511C17D00C4A49B /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -104,14 +105,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		2CC157C3181F4C3D00A5CE4E /* CrittercismSDK */ = {
+		2C8355A818E4C23E00319926 /* CrittercismSDK */ = {
 			isa = PBXGroup;
 			children = (
-				2CC157C4181F4C3D00A5CE4E /* CRFilter.h */,
-				2CC157C5181F4C3D00A5CE4E /* Crittercism.h */,
-				2CC157C6181F4C3D00A5CE4E /* CrittercismDelegate.h */,
-				2CC157C7181F4C3D00A5CE4E /* dsym_upload.sh */,
-				2CC157C8181F4C3D00A5CE4E /* libCrittercism_v4_1_1.a */,
+				2C8355A918E4C23E00319926 /* CRFilter.h */,
+				2C8355AA18E4C23E00319926 /* Crittercism.h */,
+				2C8355AB18E4C23E00319926 /* CrittercismDelegate.h */,
+				2C8355AC18E4C23E00319926 /* dsym_upload.sh */,
+				2C8355AD18E4C23E00319926 /* libCrittercism_v4_3_2.a */,
 			);
 			path = CrittercismSDK;
 			sourceTree = "<group>";
@@ -123,9 +124,12 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C8355AE18E4C23E00319926 /* CRFilter.h in Headers */,
 				9F459E7618E3C7100049C5EF /* CrittercismException.h in Headers */,
 				1698E294150FFA0900341879 /* CrittercismExtern.h in Headers */,
 				1698E295150FFA0900341879 /* CrittercismUnity.h in Headers */,
+				2C8355B018E4C23E00319926 /* CrittercismDelegate.h in Headers */,
+				2C8355AF18E4C23E00319926 /* Crittercism.h in Headers */,
 				2CED489F16FD346E003D24F5 /* CrittercismUnityLibrary-Prefix.pch in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -269,6 +273,7 @@
 					"\"$(SRCROOT)/CrittercismUnityLibrary/CrittercismSDK--v3-crashonly\"",
 					"\"$(SRCROOT)/CrittercismUnityLibrary/CrittercismSDK-v3-crashonly\"",
 					"\"$(SRCROOT)/CrittercismUnityLibrary\"",
+					"$(PROJECT_DIR)/CrittercismSDK",
 				);
 				MACH_O_TYPE = staticlib;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -294,6 +299,7 @@
 					"\"$(SRCROOT)/CrittercismUnityLibrary/CrittercismSDK--v3-crashonly\"",
 					"\"$(SRCROOT)/CrittercismUnityLibrary/CrittercismSDK-v3-crashonly\"",
 					"\"$(SRCROOT)/CrittercismUnityLibrary\"",
+					"$(PROJECT_DIR)/CrittercismSDK",
 				);
 				MACH_O_TYPE = staticlib;
 				OTHER_CODE_SIGN_FLAGS = "";
