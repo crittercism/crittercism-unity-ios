@@ -43,9 +43,6 @@ public class CrittercismTestGUI : MonoBehaviour
 			
 			Debug.Log("ValueTest");
 			CrittercismIOS.SetValue("A Value", "A Key");
-			
-			Debug.Log("EventTest");
-//			CrittercismIOS.LogEvent("EventTest", null);
 		}
 	}
 	

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CrittercismInit : MonoBehaviour {
 	
-	private const string CrittercismAppID	= "YOUR_APP_ID";
+	private const string CrittercismAppID	= "52b105e9d0d8f76a04000007";
 	
 	void Awake () {
 		
