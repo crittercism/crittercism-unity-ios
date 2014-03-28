@@ -13,8 +13,8 @@
 +(void)initWithAppID:(NSString*)appID;
 +(void)logHandledException:(NSException*)exception;
 
-+(BOOL)isInited;
-+(void)logUnhandledException:(NSException *)exception;
-+(void)_callLogHandleException:(NSException*)exception;
++ (BOOL)isInited;
++ (void)logUnhandledException:(NSException *)exception;
++ (void)_callLogHandleException:(NSException*)exception;
 
 @end

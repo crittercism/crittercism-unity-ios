@@ -364,6 +364,10 @@ void Crittercism_LogUnhandledException()
   [CrittercismUnity logUnhandledException:e];
 }
 
+void Crittercism_Native_Test() {
+
+}
+
 void Crittercism_NewException(const char* name,
                               const char* reason,
                               const char *stack)

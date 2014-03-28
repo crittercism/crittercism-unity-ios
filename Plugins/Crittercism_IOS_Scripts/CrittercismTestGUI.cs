@@ -45,15 +45,15 @@ public class CrittercismTestGUI : MonoBehaviour
 			CrittercismIOS.SetValue("A Value", "A Key");
 		}
 	}
-	
-	System.Collections.IEnumerator MonoCorutineNullCrash()
+
+	private System.Collections.IEnumerator MonoCorutineNullCrash()
 	{
 		string crash = null;
 		crash	= crash.ToLower();
 		yield break;
 	}
 	
-	System.Collections.IEnumerator MonoCorutineCrash()
+	private System.Collections.IEnumerator MonoCorutineCrash()
 	{	
 		throw new System.Exception("Custom Coroutine Exception");
 	}
