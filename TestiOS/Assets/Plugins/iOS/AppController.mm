@@ -33,7 +33,7 @@
 #include "Unity/GlesHelper.h"
 
 //	The IDs will be pulled from CrittercismIDs.plist in the main bundle if this file exists
-const char* kCrittercism_App	= "CRITTERCISM_APP_ID";   // Your App ID Goes Here
+const char* kCrittercism_App	= "52b105e9d0d8f76a04000007";   // Your App ID Goes Here
 
 //	Crittercism Call into library for init
 extern "C" void Crittercism_EnableWithAppID(const char* appID);

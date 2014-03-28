@@ -45,14 +45,8 @@ public static class CrittercismIOS
 	[DllImport(_INTERNAL)]
 	private static extern string Crittercism_GetUserUUID();
 	
-    [DllImport(_INTERNAL)]
-	private static extern void Crittercism_SetAge(int age);
-    [DllImport(_INTERNAL)]
-	private static extern void Crittercism_SetGender(string gender);
 	[DllImport(_INTERNAL)]
 	private static extern void Crittercism_SetUsername(string key);
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_SetEmail(string email);
 	[DllImport(_INTERNAL)]
 	private static extern void Crittercism_SetValue(string value, string key);
 	
@@ -60,9 +54,6 @@ public static class CrittercismIOS
 	private static extern void Crittercism_SetOptOutStatus(bool status);
 	[DllImport(_INTERNAL)]
 	private static extern bool Crittercism_GetOptOutStatus();
-	
-	[DllImport(_INTERNAL)]
-	private static extern void Crittercism_RefreshSignalRegister();
 	
 #else
 	private static bool Crittercism_IsInited() { return false; }
@@ -78,17 +69,12 @@ public static class CrittercismIOS
 	private static void Crittercism_NewException(string name, string reason, string stack) {}
 	
 	private static string Crittercism_GetUserUUID()						{ return ""; }
-	
-    private static void Crittercism_SetAge(int age)									{}
-    private static void Crittercism_SetGender(string gender)						{}
+
 	private static void Crittercism_SetUsername(string key)							{}
-	private static void Crittercism_SetEmail(string email)							{}
 	private static void Crittercism_SetValue(string value, string key)				{}
 	
 	private static void Crittercism_SetOptOutStatus(bool status)					{}
 	private static bool Crittercism_GetOptOutStatus()				 { return false; }
-	
-	private static void Crittercism_RefreshSignalRegister()							{}
     
 #endif
 	
@@ -154,11 +140,6 @@ public static class CrittercismIOS
 	public static void Init(string appID, bool loadFromResources, bool handleUnityExceptions)
 	{
 		_IsPluginInited	= Crittercism_IsInited();
-		if(_IsUnityPluginInited && _IsPluginInited)
-		{
-			Crittercism_RefreshSignalRegister();
-			return;
-		}
 		
 		_HandleUnityExceptions	= handleUnityExceptions;
 		
@@ -264,29 +245,11 @@ public static class CrittercismIOS
 	static public void SetOptOut(bool s)	{	Crittercism_SetOptOutStatus(s);	}
 	
 	/// <summary>
-	/// Set the age of the user.
-	/// This will be reported in the Crittercism Meta.
-	/// </summary>
-	static public void SetAge(int age)	{	Crittercism_SetAge(age);	}
-	
-	/// <summary>
-	/// Set the Gender of the user
-	/// This will be reported in the Crittercism Meta.
-	/// </summary>
-    static public void SetGender(string gender)	{	Crittercism_SetGender(_EscapeString(gender));	}
-	
-	/// <summary>
 	/// Set the Username of the user
 	/// This will be reported in the Crittercism Meta.
 	/// </summary>
     static public void SetUsername(string username)	{	Crittercism_SetUsername(_EscapeString(username));	}
-	
-	/// <summary>
-	/// Set the Email of the user
-	/// This will be reported in the Crittercism Meta.
-	/// </summary>
-    static public void SetEmail(string email)	{	Crittercism_SetEmail(_EscapeString(email));	}
-	
+
 	/// <summary>
 	/// Add a custom value to the Crittercism Meta.
 	/// </summary>
@@ -296,25 +259,6 @@ public static class CrittercismIOS
 	/// Leave a breadcrumb for tracking.
 	/// </summary>
 	static public void LeaveBreadcrumb(string l)	{	Crittercism_LeaveBreadcrumb(_EscapeString(l));	}
-	
-	/// <summary>
-	/// Log an event with Crittercism to be sent to the Web Portal.
-	/// </summary>
-	static public void LogEvent(string eventName, System.Collections.Generic.Dictionary<string, string> vals)
-	{
-//		Crittercism_NewLog(eventName);
-		
-		if(vals != null)
-		{
-			//TODO: Check whether SetValue == SetLogValue
-			foreach(System.Collections.Generic.KeyValuePair<string,string> entry in vals)
-			{	Crittercism_SetValue(_EscapeString(entry.Key), _EscapeString(entry.Value));	}
-		}
-		
-//		Crittercism_FinishLog();
-	}
-	
-	
 	
 	static private string _EscapeString(string enter)
 	{

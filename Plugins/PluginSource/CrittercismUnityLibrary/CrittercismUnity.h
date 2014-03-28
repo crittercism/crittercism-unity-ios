@@ -2,8 +2,8 @@
 //  CrittercismsUnity.h
 //  CrittercismUnity
 //
-//  Created by Ben Bethel on 3/13/12.
-//  Copyright (c) 2012 Flying Wisdom Studios. All rights reserved.
+//  Edited by Eddie Freeman
+//  Copyright (c) 2014 Crittercism. All rights reserved.
 //
 
 #import "Crittercism.h"
@@ -13,10 +13,8 @@
 +(void)initWithAppID:(NSString*)appID;
 +(void)logHandledException:(NSException*)exception;
 
-+(BOOL)isInited;
-+(void)logUnhandledException:(NSException *)exception;
-+(void)_callLogHandleException:(NSException*)exception;
-
-//+(void)registerLocalSignalHandlers;
++ (BOOL)isInited;
++ (void)logUnhandledException:(NSException *)exception;
++ (void)_callLogHandleException:(NSException*)exception;
 
 @end
