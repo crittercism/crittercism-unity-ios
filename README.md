@@ -263,7 +263,7 @@ Change Log
 
 3.31.2014 Fixed some links that didn't display correctly on Github
 
-[2]: htttp://support.crittercism.com "Crittercism Help"
+[2]: http://support.crittercism.com "Crittercism Help"
 [12]: https://github.com/crittercism/crittercism-unity-ios/issues "Unity iOS Issues"
 [13]: https://help.github.com/articles/using-pull-requests "Pull Requests - Github"
 [14]: https://www.crittercism.com/solution-overview/ "Solution Overview"
