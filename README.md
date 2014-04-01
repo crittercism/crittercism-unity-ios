@@ -260,6 +260,7 @@ Change Log
 ------------
 
 2.9.2014. Refreshed the documentation!
+
 3.31.2014 Fixed some links that didn't display correctly on Github
 
 [2]: htttp://support.crittercism.com "Crittercism Help"
