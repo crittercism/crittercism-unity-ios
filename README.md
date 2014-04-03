@@ -56,7 +56,7 @@ Pull Requests are generally related to specific bugs, features, updates and are 
 
 Make sure the above sign-off is verbatim and uses your real name and most accurate email.
 
-Installing the Plugin 
+Installing the Plugin
 =======================
 
 Installing the Crittercism iOS Unity Plugin starts by downloading the latest iOS Unity.
@@ -104,17 +104,17 @@ Can't find your version of Unity? Don't worry, creating a new AppController is p
 **Note:** Help us out and add this new AppController to the Github repo! Create a pull request (described above) with the AppController.mm renamed with the version number, for example AppController4.2.1.mm under the "AppController" folder. Thanks for your help!
 
 ### Custom App Controller
- 
+
 If a custom AppController.mm is already being used. The Following lines will need to be added to the top of the file, and the AppID set to the values designated for your App in Crittercim web portal.
- 
+
 	// If CrittercismIDs.plist exists in the main bundle, ID’s will be pulled from the CrittercismIDs.plist.
 	// If no CrittercismIDs.plist exists, or ID’s are not found in the file, the values
 	// Below will be used.
 	const char* kCrittercism_App_ID​= "";​// Your App ID Here
-	 
+
 	// Crittercism Call into library for init
 	extern "C" void Crittercism_EnableWithAppID(const char* appID);
-	 
+
 	Add the Following Line to the top of applicationDidFinishLaunching:
 
 	// Initialize Crittercism so we can see unity startup crashes
@@ -127,7 +127,7 @@ Getting Started with Advanced Features!
 
 Capturing uncaught exceptions is a powerful tool for any developer, but sometimes you want to do even more. That's why Crittercism provides several advanced features. Here are a few getting started tips:
 
-Handled Exceptions 
+Handled Exceptions
 --------------------
 
 Crittercism allows you to capture and track disruptive crashes that interrupt the flow within the app, even if the error doesn’t result in a crash by passing handled exception objects to our servers. They’ll be grouped and symbolicated much like your normal uncaught exceptions.
@@ -188,7 +188,7 @@ Here's an example of how to use breadcrumbs for Objective-C (accepts 140 charact
 
 	[Crittercism leaveBreadcrumb:@"Class \\ Selector \\ Activity "]; // An example use, any string works
 
-User Metadata 
+User Metadata
 ---------------
 
 You can attach metadata to each user. This data will help you differentiate users on both the portal and the client. For example, if you specify a username, it will appear in the client when the user leaves feedback. On the portal, the specified username will appear both in the forum, as well as in the Crash Report tab (under Affected Users when you select a specific user), allowing you to correlate data and respond to support tickets with greater knowledge.
@@ -261,8 +261,9 @@ Change Log
 
 2.9.2014. Refreshed the documentation!
 
+3.31.2014 Fixed some links that didn't display correctly on Github
 
-[2]: htttp://support.crittercism.com 								"Crittercism Help"
-[12]: https://github.com/crittercism/crittercism-unity-ios/issues 	"Unity iOS Issues"
-[13]: https://help.github.com/articles/using-pull-requests			"Pull Requests - Github"
-[14]: https://www.crittercism.com/solution-overview/				"Solution Overview"
+[2]: http://support.crittercism.com "Crittercism Help"
+[12]: https://github.com/crittercism/crittercism-unity-ios/issues "Unity iOS Issues"
+[13]: https://help.github.com/articles/using-pull-requests "Pull Requests - Github"
+[14]: https://www.crittercism.com/solution-overview/ "Solution Overview"
