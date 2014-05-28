@@ -2,59 +2,57 @@ using UnityEngine;
 
 public class CrittercismTestGUI : MonoBehaviour
 {
-	void OnGUI()
-	{
-		int screenButtonHeight	= Screen.height / 8;
-		
-		if(GUI.Button(new Rect(0,0,Screen.width,screenButtonHeight), "Null Reference"))
-		{
-			string crash = null;
-			crash	= crash.ToLower();
-		}
-		
-		if(GUI.Button(new Rect(0,screenButtonHeight,Screen.width,screenButtonHeight), "Divide By Zero"))
-		{
-			int i = 0;
-			i = 2 / i;
-		}
-		
-		if(GUI.Button(new Rect(0,screenButtonHeight * 2,Screen.width,screenButtonHeight), "Index Out Of Range"))
-		{
-			string[] arr	= new string[1];
-			arr[2]	= "Crash";
-		}
-		
-		if(GUI.Button(new Rect(0,screenButtonHeight * 3,Screen.width,screenButtonHeight), "Custom Exception"))
-		{	throw new System.Exception("Custom Exception");	}
-		
-		if(GUI.Button(new Rect(0,screenButtonHeight * 4,Screen.width,screenButtonHeight), "Coroutine Custom Exception"))
-		{	StartCoroutine(MonoCorutineCrash());	}
-		
-		if(GUI.Button(new Rect(0,screenButtonHeight * 5,Screen.width,screenButtonHeight), "Coroutine Null Exception"))
-		{	StartCoroutine(MonoCorutineNullCrash());	}
-		
-		if(GUI.Button(new Rect(0,screenButtonHeight * 7,Screen.width,screenButtonHeight), "Test Messages"))
-		{
-			Debug.Log("BreadcrumbTest");
-			CrittercismIOS.LeaveBreadcrumb("BreadCrumb");
-			
-			Debug.Log("UserTest");
-			CrittercismIOS.SetUsername("Username");
-			
-			Debug.Log("ValueTest");
-			CrittercismIOS.SetValue("A Value", "A Key");
-		}
-	}
-	
-	System.Collections.IEnumerator MonoCorutineNullCrash()
-	{
-		string crash = null;
-		crash	= crash.ToLower();
-		yield break;
-	}
-	
-	System.Collections.IEnumerator MonoCorutineCrash()
-	{	
-		throw new System.Exception("Custom Coroutine Exception");
-	}
+        
+    void OnGUI ()
+    {
+        GUIStyle customStyle = new GUIStyle (GUI.skin.button);
+        customStyle.fontSize = 30;
+
+        int screenButtonHeight = Screen.height / 8;
+        
+        if (GUI.Button (new Rect (0, 0, Screen.width, screenButtonHeight), "Leave breadcrumb", customStyle)) {
+            CrittercismIOS.LeaveBreadcrumb ("BreadCrumb");
+        }
+        
+        if (GUI.Button (new Rect (0, screenButtonHeight, Screen.width, screenButtonHeight), "Set User Metadata", customStyle)) {
+            CrittercismIOS.SetUsername ("Username");
+            CrittercismIOS.SetValue ("5", "Game Level");
+            CrittercismIOS.SetValue ("Crashes a lot", "Status");
+        }
+        
+        if (GUI.Button (new Rect (0, screenButtonHeight * 2, Screen.width, screenButtonHeight), "C# Crash", customStyle)) {
+            causeDivideByZeroException ();
+        }
+        
+        if (GUI.Button (new Rect (0, screenButtonHeight * 3, Screen.width, screenButtonHeight), "C# Handled Exception", customStyle)) {
+            try {
+                causeDivideByZeroException ();
+            } catch (System.Exception e) {
+                CrittercismIOS.LogHandledException (e);
+            }
+        }
+
+    }
+
+    // Demo stacktraces by calling a few interim methods before crashing
+    void causeDivideByZeroException ()
+    {
+        interimMethod1 ("hi mom", 42);
+    }
+    
+    void interimMethod1 (string demoParam1, int demoParam2)
+    {
+        interimMethod2 (7, 7, "abc");
+    }
+
+    void interimMethod2 (byte demoParam1, int demoParam2, string demoParam3)
+    {
+        finallyDoTheCrash (100);
+    }
+
+    void finallyDoTheCrash (int number)
+    {
+        number /= 0;    
+    }
+
 }
