@@ -57,6 +57,8 @@ public class CrittercismEditor : EditorWindow
 		acFile	+= "4.0.1";
 #elif UNITY_4_1
 		acFile	+= "4.1";
+#elif UNITY_4_5
+		acFile	+= "4.5";
 #else
 		UnityEditor.EditorUtility.DisplayDialog("Error", "Unknown Version of Unity!", "Close");
 		return;
