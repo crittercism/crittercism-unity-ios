@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
+using System;
 
 public static class CrittercismIOS
 {
@@ -31,14 +32,25 @@ public static class CrittercismIOS
     [DllImport("__Internal")]
     private static extern bool Crittercism_GetOptOutStatus ();
 
+	// strucure DLL
+	[DllImport("libc")]
+	private static extern int sigaction (Signal sig, IntPtr act, IntPtr oact);
+
+	//SIGILL , SIGINT , SIGTERM
+	enum Signal 
+	{ 
+		SIGBUS = 10, 
+		SIGSEGV = 11
+	} 
+
     private static readonly int crittercismUnityPlatformId = 0;
 
     /// <summary>
     /// Initializes Crittercism.  Crittercism must be initialized before any other calls may be
-    /// made to Crittercism.  Once Crittercism is initialized, any crashes will be reported to 
+    /// made to Crittercism.  Once Crittercism is initialized, any crashes will be reported to
     /// Crittercism.
     /// </summary>
-    /// <param name="appID">A Crittercism app identifier.  The app identifier may be found 
+    /// <param name="appID">A Crittercism app identifier.  The app identifier may be found
     /// in the Crittercism web portal under "App Settings".</param>
     public static void Init (string appID)
     {
@@ -52,8 +64,23 @@ public static class CrittercismIOS
             return;
         }
 
-        try {
-            Crittercism_EnableWithAppID (appID);
+		try {
+			IntPtr sigbus = Marshal.AllocHGlobal (512);
+			IntPtr sigsegv = Marshal.AllocHGlobal (512);
+			
+			// Store Mono SIGSEGV and SIGBUS handlers
+			sigaction (Signal.SIGBUS, IntPtr.Zero, sigbus);
+			sigaction (Signal.SIGSEGV,IntPtr.Zero, sigsegv);
+			
+			Crittercism_EnableWithAppID (appID);
+			
+			// Restore or Destroy the handlers
+			sigaction (Signal.SIGBUS, sigbus, IntPtr.Zero);			//RESTORE
+			sigaction (Signal.SIGSEGV, sigsegv, IntPtr.Zero);		//RESTORE
+			
+			//Free sig structs
+			Marshal.FreeHGlobal (sigbus);
+			Marshal.FreeHGlobal (sigsegv);
 
             System.AppDomain.CurrentDomain.UnhandledException += _OnUnresolvedExceptionHandler;
             Application.RegisterLogCallback (_OnDebugLogCallbackHandler);
@@ -123,8 +150,8 @@ public static class CrittercismIOS
     }
 
     /// <summary>
-    /// Tell Crittercism to associate the given value/key pair with the current 
-    /// device UUID. 
+    /// Tell Crittercism to associate the given value/key pair with the current
+    /// device UUID.
     /// <param name="val">The metadata value to set</param>
     /// <param name="key">The key to associate with the given metadata<c/param>
     /// <example>SetValue("5", "Game Level")</example>
