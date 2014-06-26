@@ -39,11 +39,14 @@ public static class CrittercismIOS
 	//SIGILL , SIGINT , SIGTERM
 	enum Signal 
 	{ 
+		SIGABRT = 6, 
+		SIGFPE = 8, 
 		SIGBUS = 10, 
-		SIGSEGV = 11
+		SIGSEGV = 11, 
+		SIGPIPE = 13
 	} 
 
-    private static readonly int crittercismUnityPlatformId = 0;
+	private static readonly int crittercismUnityPlatformId = 0;
 
     /// <summary>
     /// Initializes Crittercism.  Crittercism must be initialized before any other calls may be
@@ -65,20 +68,28 @@ public static class CrittercismIOS
         }
 
 		try {
+			IntPtr sigabrt = Marshal.AllocHGlobal (512);
+			IntPtr sigfpe = Marshal.AllocHGlobal (512);
 			IntPtr sigbus = Marshal.AllocHGlobal (512);
 			IntPtr sigsegv = Marshal.AllocHGlobal (512);
 			
 			// Store Mono SIGSEGV and SIGBUS handlers
+			sigaction (Signal.SIGABRT, IntPtr.Zero, sigabrt);
+			sigaction (Signal.SIGFPE, IntPtr.Zero, sigfpe);
 			sigaction (Signal.SIGBUS, IntPtr.Zero, sigbus);
 			sigaction (Signal.SIGSEGV,IntPtr.Zero, sigsegv);
 			
 			Crittercism_EnableWithAppID (appID);
 			
 			// Restore or Destroy the handlers
+			sigaction (Signal.SIGABRT, sigabrt, IntPtr.Zero);  		//RESTORE
+			sigaction (Signal.SIGFPE, sigfpe, IntPtr.Zero);  		//RESTORE
 			sigaction (Signal.SIGBUS, sigbus, IntPtr.Zero);			//RESTORE
 			sigaction (Signal.SIGSEGV, sigsegv, IntPtr.Zero);		//RESTORE
 			
 			//Free sig structs
+			Marshal.FreeHGlobal (sigabrt);
+			Marshal.FreeHGlobal (sigfpe);
 			Marshal.FreeHGlobal (sigbus);
 			Marshal.FreeHGlobal (sigsegv);
 
