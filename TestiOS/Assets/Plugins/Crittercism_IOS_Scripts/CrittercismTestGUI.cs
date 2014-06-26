@@ -21,7 +21,7 @@ public class CrittercismTestGUI : MonoBehaviour
         }
         
         if (GUI.Button (new Rect (0, screenButtonHeight * 2, Screen.width, screenButtonHeight), "C# Crash", customStyle)) {
-            causeDivideByZeroException ();
+			causeDivideByZeroException ();
         }
         
         if (GUI.Button (new Rect (0, screenButtonHeight * 3, Screen.width, screenButtonHeight), "C# Handled Exception", customStyle)) {
@@ -31,7 +31,13 @@ public class CrittercismTestGUI : MonoBehaviour
                 CrittercismIOS.LogHandledException (e);
             }
         }
-
+		if (GUI.Button (new Rect (0, screenButtonHeight * 4, Screen.width, screenButtonHeight), "C# Null Pointer Exception", customStyle)) {
+			try {
+				causeNullPointerException ();
+			} catch (System.Exception e) {
+				CrittercismIOS.LogHandledException (e);
+			}
+		}
     }
 
     // Demo stacktraces by calling a few interim methods before crashing
@@ -39,6 +45,12 @@ public class CrittercismTestGUI : MonoBehaviour
     {
         interimMethod1 ("hi mom", 42);
     }
+
+	void causeNullPointerException ()
+	{
+		object o = null;
+		o.GetHashCode ();
+	}
     
     void interimMethod1 (string demoParam1, int demoParam2)
     {
