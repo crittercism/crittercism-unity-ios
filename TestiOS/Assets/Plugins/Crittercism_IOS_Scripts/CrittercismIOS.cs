@@ -31,11 +31,11 @@ public static class CrittercismIOS
 
     [DllImport("__Internal")]
     private static extern bool Crittercism_GetOptOutStatus ();
-
+	
 	// strucure DLL
 	[DllImport("libc")]
 	private static extern int sigaction (Signal sig, IntPtr act, IntPtr oact);
-
+	
 	//SIGILL , SIGINT , SIGTERM
 	enum Signal 
 	{ 
@@ -68,10 +68,23 @@ public static class CrittercismIOS
         }
 
 		try {
-			IntPtr sigabrt = Marshal.AllocHGlobal (512);
-			IntPtr sigfpe = Marshal.AllocHGlobal (512);
-			IntPtr sigbus = Marshal.AllocHGlobal (512);
-			IntPtr sigsegv = Marshal.AllocHGlobal (512);
+			int ptrSize;
+
+			// sizeof(struct sigaction) from <signal.h>
+			if(IntPtr.Size == 4) 
+			{
+				ptrSize = 12; // 32-bit
+			}
+			// sizeof(struct sigaction) from <signal.h>
+			else 
+			{
+				ptrSize = 16; // 64-bit
+			}
+
+			IntPtr sigabrt = Marshal.AllocHGlobal (ptrSize);
+			IntPtr sigfpe = Marshal.AllocHGlobal (ptrSize);
+			IntPtr sigbus = Marshal.AllocHGlobal (ptrSize);
+			IntPtr sigsegv = Marshal.AllocHGlobal (ptrSize);
 			
 			// Store Mono SIGSEGV and SIGBUS handlers
 			sigaction (Signal.SIGABRT, IntPtr.Zero, sigabrt);

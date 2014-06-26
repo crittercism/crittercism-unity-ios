@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
+using System;
 
 public static class CrittercismIOS
 {
@@ -30,15 +31,29 @@ public static class CrittercismIOS
 
     [DllImport("__Internal")]
     private static extern bool Crittercism_GetOptOutStatus ();
+	
+	// strucure DLL
+	[DllImport("libc")]
+	private static extern int sigaction (Signal sig, IntPtr act, IntPtr oact);
+	
+	//SIGILL , SIGINT , SIGTERM
+	enum Signal 
+	{ 
+		SIGABRT = 6, 
+		SIGFPE = 8, 
+		SIGBUS = 10, 
+		SIGSEGV = 11, 
+		SIGPIPE = 13
+	} 
 
-    private static readonly int crittercismUnityPlatformId = 0;
+	private static readonly int crittercismUnityPlatformId = 0;
 
     /// <summary>
     /// Initializes Crittercism.  Crittercism must be initialized before any other calls may be
-    /// made to Crittercism.  Once Crittercism is initialized, any crashes will be reported to 
+    /// made to Crittercism.  Once Crittercism is initialized, any crashes will be reported to
     /// Crittercism.
     /// </summary>
-    /// <param name="appID">A Crittercism app identifier.  The app identifier may be found 
+    /// <param name="appID">A Crittercism app identifier.  The app identifier may be found
     /// in the Crittercism web portal under "App Settings".</param>
     public static void Init (string appID)
     {
@@ -52,8 +67,44 @@ public static class CrittercismIOS
             return;
         }
 
-        try {
-            Crittercism_EnableWithAppID (appID);
+		try {
+			int ptrSize;
+
+			// sizeof(struct sigaction) from <signal.h>
+			if(IntPtr.Size == 4) 
+			{
+				ptrSize = 12; // 32-bit
+			}
+			// sizeof(struct sigaction) from <signal.h>
+			else 
+			{
+				ptrSize = 16; // 64-bit
+			}
+
+			IntPtr sigabrt = Marshal.AllocHGlobal (ptrSize);
+			IntPtr sigfpe = Marshal.AllocHGlobal (ptrSize);
+			IntPtr sigbus = Marshal.AllocHGlobal (ptrSize);
+			IntPtr sigsegv = Marshal.AllocHGlobal (ptrSize);
+			
+			// Store Mono SIGSEGV and SIGBUS handlers
+			sigaction (Signal.SIGABRT, IntPtr.Zero, sigabrt);
+			sigaction (Signal.SIGFPE, IntPtr.Zero, sigfpe);
+			sigaction (Signal.SIGBUS, IntPtr.Zero, sigbus);
+			sigaction (Signal.SIGSEGV,IntPtr.Zero, sigsegv);
+			
+			Crittercism_EnableWithAppID (appID);
+			
+			// Restore or Destroy the handlers
+			sigaction (Signal.SIGABRT, sigabrt, IntPtr.Zero);  		//RESTORE
+			sigaction (Signal.SIGFPE, sigfpe, IntPtr.Zero);  		//RESTORE
+			sigaction (Signal.SIGBUS, sigbus, IntPtr.Zero);			//RESTORE
+			sigaction (Signal.SIGSEGV, sigsegv, IntPtr.Zero);		//RESTORE
+			
+			//Free sig structs
+			Marshal.FreeHGlobal (sigabrt);
+			Marshal.FreeHGlobal (sigfpe);
+			Marshal.FreeHGlobal (sigbus);
+			Marshal.FreeHGlobal (sigsegv);
 
             System.AppDomain.CurrentDomain.UnhandledException += _OnUnresolvedExceptionHandler;
             Application.RegisterLogCallback (_OnDebugLogCallbackHandler);
@@ -123,8 +174,8 @@ public static class CrittercismIOS
     }
 
     /// <summary>
-    /// Tell Crittercism to associate the given value/key pair with the current 
-    /// device UUID. 
+    /// Tell Crittercism to associate the given value/key pair with the current
+    /// device UUID.
     /// <param name="val">The metadata value to set</param>
     /// <param name="key">The key to associate with the given metadata<c/param>
     /// <example>SetValue("5", "Game Level")</example>
