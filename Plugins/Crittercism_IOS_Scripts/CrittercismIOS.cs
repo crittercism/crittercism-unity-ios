@@ -31,7 +31,25 @@ public static class CrittercismIOS
 
     [DllImport("__Internal")]
     private static extern bool Crittercism_GetOptOutStatus ();
+
+	[DllImport("__Internal")]
+	private static extern void Crittercism_BeginTransaction (string name);
+
+	[DllImport("__Internal")]
+	private static extern void Crittercism_BeginTransactionWithValue (string name, int value);
+
+	[DllImport("__Internal")]
+	private static extern void Crittercism_EndTransaction (string name);
+
+	[DllImport("__Internal")]
+	private static extern void Crittercism_FailTransaction (string name);
 	
+	[DllImport("__Internal")]
+	private static extern void Crittercism_SetTransactionValue (string name, int value);
+
+	[DllImport("__Internal")]
+	private static extern int Crittercism_GetTransactionValue (string name);
+
 	// strucure DLL
 	[DllImport("libc")]
 	private static extern int sigaction (Signal sig, IntPtr act, IntPtr oact);
@@ -200,6 +218,65 @@ public static class CrittercismIOS
             Crittercism_LeaveBreadcrumb (breadcrumb);
         }
     }
+
+	/// <summary>
+	/// Begin a transaction to track ex. login
+	/// </summary>
+	static public void BeginTransaction (string name)
+	{
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			Crittercism_BeginTransaction (name);
+		}
+	}
+
+	static public void BeginTransaction (string name, int value)
+	{
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			Crittercism_BeginTransactionWithValue (name, value);
+		}
+	}
+	
+	/// <summary>
+	/// Ends a tracked transaction ex. login was successful
+	/// </summary>
+	static public void EndTransaction (string name)
+	{
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			Crittercism_EndTransaction (name);
+		}
+	}
+	
+	/// <summary>
+	/// Fails a tracked transaction ex. login error
+	/// </summary>
+	static public void FailTransaction (string name)
+	{
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			Crittercism_FailTransaction (name);
+		}
+	}
+	
+	/// <summary>
+	/// Set a value for a transaction ex. shopping cart value
+	/// </summary>
+	static public void SetTransactionValue (string name, int value)
+	{
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			Crittercism_SetTransactionValue (name, value);
+		};
+	}
+	
+	/// <summary>
+	/// Get the current value of the tracked transaction
+	/// </summary>
+	static public int GetTransactionValue (string name)
+	{
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			return Crittercism_GetTransactionValue (name);
+		} else {
+			return -1;
+		}
+	}
 
     static private void _OnUnresolvedExceptionHandler (object sender, System.UnhandledExceptionEventArgs args)
     {
