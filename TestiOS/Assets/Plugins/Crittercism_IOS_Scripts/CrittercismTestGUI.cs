@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class CrittercismTestGUI : MonoBehaviour
@@ -21,20 +22,20 @@ public class CrittercismTestGUI : MonoBehaviour
         }
         
         if (GUI.Button (new Rect (0, screenButtonHeight * 2, Screen.width, screenButtonHeight), "C# Crash", customStyle)) {
-			causeDivideByZeroException ();
+			crashInnerException ();
         }
         
         if (GUI.Button (new Rect (0, screenButtonHeight * 3, Screen.width, screenButtonHeight), "C# Handled Exception", customStyle)) {
             try {
-                causeDivideByZeroException ();
-            } catch (System.Exception e) {
+				crashInnerException ();
+            } catch (Exception e) {
                 CrittercismIOS.LogHandledException (e);
             }
         }
 		if (GUI.Button (new Rect (0, screenButtonHeight * 4, Screen.width, screenButtonHeight), "C# Null Pointer Exception", customStyle)) {
 			try {
 				causeNullPointerException ();
-			} catch (System.Exception e) {
+			} catch (Exception e) {
 				CrittercismIOS.LogHandledException (e);
 			}
 		}
@@ -65,31 +66,27 @@ public class CrittercismTestGUI : MonoBehaviour
 		}
     }
 
-    // Demo stacktraces by calling a few interim methods before crashing
-    void causeDivideByZeroException ()
-    {
-        interimMethod1 ("hi mom", 42);
-    }
+	public void DeepError(int n)
+	{
+		if (n == 0) {
+			throw new Exception("Deep Inner Exception");
+		} else {
+			DeepError(n - 1);
+		}
+	}
+	
+	public void crashInnerException()
+	{
+		try {
+			DeepError(4);
+		} catch (Exception ie) {
+			throw new Exception("Outer Exception", ie);
+		}
+	}
 
 	void causeNullPointerException ()
 	{
 		object o = null;
 		o.GetHashCode ();
 	}
-    
-    void interimMethod1 (string demoParam1, int demoParam2)
-    {
-        interimMethod2 (7, 7, "abc");
-    }
-
-    void interimMethod2 (byte demoParam1, int demoParam2, string demoParam3)
-    {
-        finallyDoTheCrash (100);
-    }
-
-    void finallyDoTheCrash (int number)
-    {
-        number /= 0;    
-    }
-
 }
