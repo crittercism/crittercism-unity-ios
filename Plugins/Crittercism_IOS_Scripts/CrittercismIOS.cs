@@ -7,7 +7,7 @@ public static class CrittercismIOS
 {
 
 	[DllImport("__Internal")]
-	private static extern void Crittercism_EnableWithAppID (string appID);
+	private static extern void Crittercism_EnableWithAppID_NoNativeCrashReporting (string appID, bool enableServiceMonitoring);
 
 	[DllImport("__Internal")]
 	private static extern bool Crittercism_LogHandledException (string name, string reason, string stack, int platformId);
@@ -51,20 +51,6 @@ public static class CrittercismIOS
 	[DllImport("__Internal")]
 	private static extern int Crittercism_GetTransactionValue (string name);
 
-	// strucure DLL
-	[DllImport("libc")]
-	private static extern int sigaction (Signal sig, IntPtr act, IntPtr oact);
-	
-	//SIGILL , SIGINT , SIGTERM
-	enum Signal
-	{ 
-		SIGABRT = 6, 
-		SIGFPE = 8, 
-		SIGBUS = 10, 
-		SIGSEGV = 11, 
-		SIGPIPE = 13
-	} 
-
 	// Crittercism-ios CRPluginException.h defines crPlatformId crUnityId = 0 .
 	private const int crUnityId = 0;
 
@@ -81,40 +67,16 @@ public static class CrittercismIOS
 			Debug.Log ("CrittercismIOS only supports the iOS platform. Crittercism will not be enabled");
 			return;
 		}
+
 		if (appID == null) {
 			Debug.Log ("Crittercism given a null app ID");
 			return;
 		}
+
 		try {
-			// Signal handlers
-			int ptrSize;
-			if (IntPtr.Size == 4) {
-				// sizeof(struct sigaction) from <signal.h>
-				ptrSize = 12; // 32-bit
-			} else {
-				// sizeof(struct sigaction) from <signal.h>
-				ptrSize = 16; // 64-bit
-			}
-			IntPtr sigabrt = Marshal.AllocHGlobal (ptrSize);
-			IntPtr sigfpe = Marshal.AllocHGlobal (ptrSize);
-			IntPtr sigbus = Marshal.AllocHGlobal (ptrSize);
-			IntPtr sigsegv = Marshal.AllocHGlobal (ptrSize);
-			// Store Mono SIGSEGV and SIGBUS handlers
-			sigaction (Signal.SIGABRT, IntPtr.Zero, sigabrt);
-			sigaction (Signal.SIGFPE, IntPtr.Zero, sigfpe);
-			sigaction (Signal.SIGBUS, IntPtr.Zero, sigbus);
-			sigaction (Signal.SIGSEGV, IntPtr.Zero, sigsegv);
-			Crittercism_EnableWithAppID (appID);
-			// Restore or Destroy the handlers
-			sigaction (Signal.SIGABRT, sigabrt, IntPtr.Zero);  		//RESTORE
-			sigaction (Signal.SIGFPE, sigfpe, IntPtr.Zero);  		//RESTORE
-			sigaction (Signal.SIGBUS, sigbus, IntPtr.Zero);			//RESTORE
-			sigaction (Signal.SIGSEGV, sigsegv, IntPtr.Zero);		//RESTORE
-			// Free sig structs
-			Marshal.FreeHGlobal (sigabrt);
-			Marshal.FreeHGlobal (sigfpe);
-			Marshal.FreeHGlobal (sigbus);
-			Marshal.FreeHGlobal (sigsegv);
+
+			Crittercism_EnableWithAppID_NoNativeCrashReporting (appID, true);
+
 			// Add _OnUnresolvedExceptionHandler
 			System.AppDomain.CurrentDomain.UnhandledException += _OnUnresolvedExceptionHandler;
 			Application.RegisterLogCallback (_OnDebugLogCallbackHandler);
