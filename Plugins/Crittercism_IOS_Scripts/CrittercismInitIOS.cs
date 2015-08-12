@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class CrittercismInit : MonoBehaviour
+public class CrittercismInitIOS : MonoBehaviour
 {
 	/// <summary>
 	/// Your Crittercism App ID.  Every app has a special identifier that allows Crittercism
@@ -14,7 +14,9 @@ public class CrittercismInit : MonoBehaviour
     
 	void Awake ()
 	{
+#if UNITY_IOS
 		CrittercismIOS.Init (CrittercismAppID);
+#endif
 		Destroy (this);
 	}
 }
