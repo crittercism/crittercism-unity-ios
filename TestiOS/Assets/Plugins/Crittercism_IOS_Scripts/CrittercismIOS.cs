@@ -7,7 +7,7 @@ public static class CrittercismIOS
 {
 
 	[DllImport("__Internal")]
-	private static extern void Crittercism_EnableWithAppID_NoNativeCrashReporting (string appID, bool enableServiceMonitoring);
+	private static extern void Crittercism_EnableWithAppID (string appID, bool enableServiceMonitoring);
 
 	[DllImport("__Internal")]
 	private static extern bool Crittercism_LogHandledException (string name, string reason, string stack, int platformId);
@@ -75,7 +75,7 @@ public static class CrittercismIOS
 
 		try {
 
-			Crittercism_EnableWithAppID_NoNativeCrashReporting (appID, true);
+			Crittercism_EnableWithAppID (appID, true);
 
 			// Add _OnUnresolvedExceptionHandler
 			System.AppDomain.CurrentDomain.UnhandledException += _OnUnresolvedExceptionHandler;
