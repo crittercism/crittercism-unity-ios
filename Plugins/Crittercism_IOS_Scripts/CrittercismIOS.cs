@@ -262,9 +262,8 @@ public static class CrittercismIOS
 			return;
 		}
 		try {
-			System.Type type = args.ExceptionObject.GetType ();
-			if (type == typeof(System.Exception)) {
-				System.Exception e = (System.Exception)args.ExceptionObject;
+			System.Exception e = args.ExceptionObject as System.Exception;
+			if (e != null) {
 				if (Application.platform == RuntimePlatform.IPhonePlayer) {
 					// Should never get here since the Init() call would have bailed on the same if statement
 					Crittercism_LogUnhandledException (e.GetType ().FullName, e.Message, StackTrace (e), crUnityId);
