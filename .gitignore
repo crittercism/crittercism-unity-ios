@@ -1,3 +1,8 @@
+*.sw[m-p]
+
+# Local
+archive/
+
 # =============== #
 # Unity generated #
 # =============== #
@@ -29,7 +34,8 @@ x64/
 *.vspscc
 *.vssscc
 .builds
-TestiOS/TestApp/
+*MrsCritter*
+*TestApp*
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
