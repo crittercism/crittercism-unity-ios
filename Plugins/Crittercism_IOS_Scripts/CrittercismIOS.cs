@@ -278,7 +278,7 @@ public static class CrittercismIOS
 
 	static private void _OnDebugLogCallbackHandler (string name, string stack, LogType type)
 	{
-		if (LogType.Exception == type || LogType.Assert == type) {
+		if (LogType.Exception == type) {
 			if (Application.platform == RuntimePlatform.IPhonePlayer) {
 				// Should never get here since the Init() call would have bailed on the same if statement
 				Crittercism_LogUnhandledException (name, name, stack, crUnityId);
