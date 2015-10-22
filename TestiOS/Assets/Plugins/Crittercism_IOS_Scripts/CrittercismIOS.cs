@@ -52,6 +52,9 @@ public static class CrittercismIOS
 
 	// Crittercism-ios CRPluginException.h defines crPlatformId crUnityId = 0 .
 	private const int crUnityId = 0;
+	
+	// Reporting uncaught C# Exception's as crashes (red blips)?
+	private static volatile bool logUnhandledExceptionAsCrash = false;
 
 	/// <summary>
 	/// Initializes Crittercism.  Crittercism must be initialized before any other calls may be
@@ -269,9 +272,6 @@ public static class CrittercismIOS
 			}
 		}
 	}
-
-	// Reporting uncaught C# Exception's as crashes (red blips)?
-	private static volatile bool logUnhandledExceptionAsCrash = false;
 
 	/// <summary>
 	/// Report uncaught C# Exception's as crashes (red blips) iff value is true .
