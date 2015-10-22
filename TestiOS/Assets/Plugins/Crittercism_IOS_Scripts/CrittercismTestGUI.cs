@@ -6,6 +6,7 @@ public class CrittercismTestGUI : MonoBehaviour
         
 	void OnGUI ()
 	{
+		CrittercismIOS.SetLogUnhandledExceptionAsCrash (true);
 		GUIStyle customStyle = new GUIStyle (GUI.skin.button);
 		customStyle.fontSize = 30;
 		const int numberOfButtons = 11;

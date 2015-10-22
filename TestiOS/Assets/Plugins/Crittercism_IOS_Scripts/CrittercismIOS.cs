@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 
 public static class CrittercismIOS
 {
-
 	[DllImport("__Internal")]
 	private static extern void Crittercism_EnableWithAppID (string appID, bool enableServiceMonitoring);
 
@@ -53,6 +52,9 @@ public static class CrittercismIOS
 
 	// Crittercism-ios CRPluginException.h defines crPlatformId crUnityId = 0 .
 	private const int crUnityId = 0;
+	
+	// Reporting uncaught C# Exception's as crashes (red blips)?
+	private static volatile bool logUnhandledExceptionAsCrash = false;
 
 	/// <summary>
 	/// Initializes Crittercism.  Crittercism must be initialized before any other calls may be
@@ -67,26 +69,21 @@ public static class CrittercismIOS
 			Debug.Log ("CrittercismIOS only supports the iOS platform. Crittercism will not be enabled");
 			return;
 		}
-
 		if (appID == null) {
 			Debug.Log ("Crittercism given a null app ID");
 			return;
 		}
-
 		try {
-
 			Crittercism_EnableWithAppID (appID, true);
-
-			// Add _OnUnresolvedExceptionHandler
-			System.AppDomain.CurrentDomain.UnhandledException += _OnUnresolvedExceptionHandler;
-			Application.RegisterLogCallback (_OnDebugLogCallbackHandler);
+			AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+			Application.logMessageReceived += OnLogMessageReceived;
 			Debug.Log ("CrittercismIOS: Sucessfully Initialized");
 		} catch {
 			Debug.Log ("Crittercism Unity plugin failed to initialize.");
 		}
 	}
 
-	private static string StackTrace (System.Exception e)
+	private static string StackTrace (Exception e)
 	{
 		// Allowing for the fact that the "name" and "reason" of the outermost
 		// exception e are already shown in the Crittercism portal, we don't
@@ -96,14 +93,14 @@ public static class CrittercismIOS
 		// outermost Exception e .
 		string answer = e.StackTrace;
 		// Using seen for cycle detection to break cycling.
-		List<System.Exception> seen = new List<System.Exception> ();
+		List<Exception> seen = new List<Exception> ();
 		seen.Add (e);
 		if (answer != null) {
 			// There has to be some way of telling where InnerException ie stacktrace
 			// ends and main Exception e stacktrace begins.  This is it.
 			answer = ((e.GetType ().FullName + " : " + e.Message + "\r\n")
 				+ answer);
-			System.Exception ie = e.InnerException;
+			Exception ie = e.InnerException;
 			while ((ie != null) && (seen.IndexOf(ie) < 0)) {
 				seen.Add (ie);
 				answer = ((ie.GetType ().FullName + " : " + ie.Message + "\r\n")
@@ -122,7 +119,7 @@ public static class CrittercismIOS
 	/// This exception will be reported to the Crittercism portal.
 	/// </summary>
 	/// <param name="e">A caught exception that should be reported to Crittercism.</param>
-	static public void LogHandledException (System.Exception e)
+	public static void LogHandledException (Exception e)
 	{
 		if (e == null) {
 			return;
@@ -137,7 +134,7 @@ public static class CrittercismIOS
 	/// sent to Crittercism.
 	/// </summary>
 	/// <returns>True if the user has opted out of Crittercism</returns>
-	static public bool GetOptOut ()
+	public static bool GetOptOut ()
 	{
 		bool isOptedOut = true;
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
@@ -150,7 +147,7 @@ public static class CrittercismIOS
 	/// Changes whether the user is opted in or out of reporting data to Crittercism.
 	/// </summary>
 	/// <param name="isOptedOut">True to opt out of sending data to Crittercism</param>
-	static public void SetOptOut (bool isOptedOut)
+	public static void SetOptOut (bool isOptedOut)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_SetOptOutStatus (isOptedOut);
@@ -161,7 +158,7 @@ public static class CrittercismIOS
 	/// Set the Username of the current user.
 	/// </summary>
 	/// <param name="username">The user name to set</param>
-	static public void SetUsername (string username)
+	public static void SetUsername (string username)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_SetUsername (username);
@@ -175,7 +172,7 @@ public static class CrittercismIOS
 	/// <param name="key">The key to associate with the given metadata<c/param>
 	/// <example>SetValue("5", "Game Level")</example>
 	/// </summary>
-	static public void SetValue (string val, string key)
+	public static void SetValue (string val, string key)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_SetValue (val, key);
@@ -189,7 +186,7 @@ public static class CrittercismIOS
 	/// </summary>
 	/// <param name="breadcrumb">The breadcrumb text to append to the breadcrumb trail</param>
 	/// <example>LeaveBreadcrumb("Game started");</example>
-	static public void LeaveBreadcrumb (string breadcrumb)
+	public static void LeaveBreadcrumb (string breadcrumb)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_LeaveBreadcrumb (breadcrumb);
@@ -199,14 +196,14 @@ public static class CrittercismIOS
 	/// <summary>
 	/// Begin a transaction to track ex. login
 	/// </summary>
-	static public void BeginTransaction (string name)
+	public static void BeginTransaction (string name)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_BeginTransaction (name);
 		}
 	}
 
-	static public void BeginTransaction (string name, int value)
+	public static void BeginTransaction (string name, int value)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_BeginTransactionWithValue (name, value);
@@ -216,7 +213,7 @@ public static class CrittercismIOS
 	/// <summary>
 	/// Ends a tracked transaction ex. login was successful
 	/// </summary>
-	static public void EndTransaction (string name)
+	public static void EndTransaction (string name)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_EndTransaction (name);
@@ -226,7 +223,7 @@ public static class CrittercismIOS
 	/// <summary>
 	/// Fails a tracked transaction ex. login error
 	/// </summary>
-	static public void FailTransaction (string name)
+	public static void FailTransaction (string name)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_FailTransaction (name);
@@ -236,7 +233,7 @@ public static class CrittercismIOS
 	/// <summary>
 	/// Set a value for a transaction ex. shopping cart value
 	/// </summary>
-	static public void SetTransactionValue (string name, int value)
+	public static void SetTransactionValue (string name, int value)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_SetTransactionValue (name, value);
@@ -247,7 +244,7 @@ public static class CrittercismIOS
 	/// <summary>
 	/// Get the current value of the tracked transaction
 	/// </summary>
-	static public int GetTransactionValue (string name)
+	public static int GetTransactionValue (string name)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			return Crittercism_GetTransactionValue (name);
@@ -256,13 +253,13 @@ public static class CrittercismIOS
 		}
 	}
 
-	static private void _OnUnresolvedExceptionHandler (object sender, System.UnhandledExceptionEventArgs args)
+	private static void OnUnhandledException (object sender, UnhandledExceptionEventArgs args)
 	{
 		if (args == null || args.ExceptionObject == null) {
 			return;
 		}
 		try {
-			System.Exception e = args.ExceptionObject as System.Exception;
+			Exception e = args.ExceptionObject as Exception;
 			if (e != null) {
 				if (Application.platform == RuntimePlatform.IPhonePlayer) {
 					// Should never get here since the Init() call would have bailed on the same if statement
@@ -276,12 +273,31 @@ public static class CrittercismIOS
 		}
 	}
 
-	static private void _OnDebugLogCallbackHandler (string name, string stack, LogType type)
+	/// <summary>
+	/// Report uncaught C# Exception's as crashes (red blips) iff value is true .
+	/// </summary>
+	public static void SetLogUnhandledExceptionAsCrash (bool value)
 	{
-		if (LogType.Exception == type) {
+		logUnhandledExceptionAsCrash = value;
+	}
+
+	/// <summary>
+	/// Reporting uncaught C# Exception's as crashes (red blips)?
+	/// </summary>
+	public static bool GetLogUnhandledExceptionAsCrash ()
+	{
+		return logUnhandledExceptionAsCrash;
+	}
+
+	private static void OnLogMessageReceived (String name, String stack, LogType type)
+	{
+		if (type == LogType.Exception) {
 			if (Application.platform == RuntimePlatform.IPhonePlayer) {
-				// Should never get here since the Init() call would have bailed on the same if statement
-				Crittercism_LogUnhandledException (name, name, stack, crUnityId);
+				if (logUnhandledExceptionAsCrash) {
+					Crittercism_LogUnhandledException (name, name, stack, crUnityId);
+				} else {
+					Crittercism_LogHandledException (name, name, stack, crUnityId);
+				}
 			}
 		}
 	}
