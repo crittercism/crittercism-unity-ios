@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Runtime.InteropServices;
 
 public static class CrittercismIOS
@@ -14,6 +15,15 @@ public static class CrittercismIOS
 	[DllImport("__Internal")]
 	private static extern void Crittercism_LogUnhandledException (string name, string reason, string stack, int platformId);
 
+	[DllImport("__Internal")]
+	private static extern bool Crittercism_LogNetworkRequest(string method,
+	                                                         string uriString,
+	                                                         double latency,
+	                                                         int bytesRead,
+	                                                         int bytesSent,
+	                                                         int responseCode,
+	                                                         int errorCode);
+	
 	[DllImport("__Internal")]
 	private static extern void Crittercism_SetAsyncBreadcrumbMode (bool writeAsync);
 
@@ -190,6 +200,19 @@ public static class CrittercismIOS
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Crittercism_LeaveBreadcrumb (breadcrumb);
+		}
+	}
+
+	public static void LogNetworkRequest (string method,
+	                                      string uriString,
+	                                      double latency,
+	                                      int bytesRead,
+	                                      int bytesSent,
+	                                      HttpStatusCode responseCode,
+	                                      WebExceptionStatus exceptionStatus)
+	{
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			Crittercism_LogNetworkRequest (method, uriString, latency, bytesRead, bytesSent, (int)responseCode, (int)exceptionStatus);
 		}
 	}
 
