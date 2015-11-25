@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class CrittercismTestGUI : MonoBehaviour
 {
+	private CrittercismTestGUI() {
+		Debug.Log ("DidCrashOnLastLoad: " + CrittercismIOS.DidCrashOnLastLoad ());
+		CrittercismIOS.SetLogUnhandledExceptionAsCrash (true);
+	}
+
 	private static string[] uriStrings=new string[] {
 		"http://www.crittergerbil.com",
 		"http://www.critterhamster.com",
@@ -14,13 +19,12 @@ public class CrittercismTestGUI : MonoBehaviour
 		"http://www.crittersquirrel.com",
 		"http://www.mrscritter.com"
 	};
-
+	
 	public void OnGUI ()
 	{
-		CrittercismIOS.SetLogUnhandledExceptionAsCrash (true);
 		GUIStyle customStyle = new GUIStyle (GUI.skin.button);
 		customStyle.fontSize = 30;
-		const int numberOfButtons = 12;
+		const int numberOfButtons = 13;
 		int screenButtonHeight = Screen.height / numberOfButtons;
 		if (GUI.Button (new Rect (0, 0, Screen.width, screenButtonHeight), "Set Username", customStyle)) {
 			CrittercismIOS.SetUsername ("MommaCritter");
@@ -86,10 +90,13 @@ public class CrittercismTestGUI : MonoBehaviour
 		if (GUI.Button (new Rect (0, 9 * screenButtonHeight, Screen.width, screenButtonHeight), "Fail Transaction", customStyle)) {
 			CrittercismIOS.FailTransaction ("UnityIOS");
 		}
-		if (GUI.Button (new Rect (0, 10 * screenButtonHeight, Screen.width, screenButtonHeight), "Set Transaction Value", customStyle)) {
+		if (GUI.Button (new Rect (0, 10 * screenButtonHeight, Screen.width, screenButtonHeight), "Cancel Transaction", customStyle)) {
+			CrittercismIOS.CancelTransaction ("UnityIOS");
+		}
+		if (GUI.Button (new Rect (0, 11 * screenButtonHeight, Screen.width, screenButtonHeight), "Set Transaction Value", customStyle)) {
 			CrittercismIOS.SetTransactionValue ("UnityIOS", 500);
 		}
-		if (GUI.Button (new Rect (0, 11 * screenButtonHeight, Screen.width, screenButtonHeight), "Get Transaction Value", customStyle)) {
+		if (GUI.Button (new Rect (0, 12 * screenButtonHeight, Screen.width, screenButtonHeight), "Get Transaction Value", customStyle)) {
 			int value = CrittercismIOS.GetTransactionValue ("UnityIOS");
 			Debug.Log ("TransactionValue is: " + value);
 		}
