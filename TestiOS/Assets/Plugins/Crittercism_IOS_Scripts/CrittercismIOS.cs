@@ -223,7 +223,7 @@ public static class CrittercismIOS
 	}
 
 	/// <summary>
-	/// Init and begin a transaction with a default value.
+	/// Did the application crash on the previous load?
 	/// </summary>
 	public static bool DidCrashOnLastLoad ()
 	{

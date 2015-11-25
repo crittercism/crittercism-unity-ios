@@ -40,6 +40,9 @@ public static class CrittercismIOS
 	private static extern void Crittercism_SetOptOutStatus (bool status);
 
 	[DllImport("__Internal")]
+	private static extern bool Crittercism_DidCrashOnLastLoad();
+	
+	[DllImport("__Internal")]
 	private static extern bool Crittercism_GetOptOutStatus ();
 
 	[DllImport("__Internal")]
@@ -54,6 +57,9 @@ public static class CrittercismIOS
 	[DllImport("__Internal")]
 	private static extern void Crittercism_FailTransaction (string name);
 	
+	[DllImport("__Internal")]
+	private static extern void Crittercism_CancelTransaction (string name);
+
 	[DllImport("__Internal")]
 	private static extern void Crittercism_SetTransactionValue (string name, int value);
 
@@ -217,7 +223,19 @@ public static class CrittercismIOS
 	}
 
 	/// <summary>
-	/// Begin a transaction to track ex. login
+	/// Did the application crash on the previous load?
+	/// </summary>
+	public static bool DidCrashOnLastLoad ()
+	{
+		bool answer = false;
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			answer = Crittercism_DidCrashOnLastLoad ();
+		}
+		return answer;
+	}
+
+	/// <summary>
+	/// Init and begin a transaction with a default value.
 	/// </summary>
 	public static void BeginTransaction (string name)
 	{
@@ -226,6 +244,9 @@ public static class CrittercismIOS
 		}
 	}
 
+	/// <summary>
+	/// Init and begin a transaction with an input value.
+	/// </summary>
 	public static void BeginTransaction (string name, int value)
 	{
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
@@ -234,7 +255,17 @@ public static class CrittercismIOS
 	}
 	
 	/// <summary>
-	/// Ends a tracked transaction ex. login was successful
+	/// Cancel a transaction as if it never existed.
+	/// </summary>
+	public static void CancelTransaction (string name)
+	{
+		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+			Crittercism_CancelTransaction (name);
+		}
+	}
+
+	/// <summary>
+	/// End an already begun transaction successfully.
 	/// </summary>
 	public static void EndTransaction (string name)
 	{
@@ -244,7 +275,7 @@ public static class CrittercismIOS
 	}
 	
 	/// <summary>
-	/// Fails a tracked transaction ex. login error
+	/// End an already begun transaction as a failure.
 	/// </summary>
 	public static void FailTransaction (string name)
 	{
@@ -254,7 +285,7 @@ public static class CrittercismIOS
 	}
 	
 	/// <summary>
-	/// Set a value for a transaction ex. shopping cart value
+	/// Set the currency cents value of a transaction.
 	/// </summary>
 	public static void SetTransactionValue (string name, int value)
 	{
@@ -265,7 +296,7 @@ public static class CrittercismIOS
 	}
 	
 	/// <summary>
-	/// Get the current value of the tracked transaction
+	/// Get the currency cents value of a transaction.
 	/// </summary>
 	public static int GetTransactionValue (string name)
 	{
